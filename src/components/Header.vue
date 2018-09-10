@@ -2,15 +2,21 @@
 <div>
   <div class="header">
     <div class="header-left">
-        <span class="iconfont">&#xe61b;</span>
+       <span class="iconfont font">&#xeed4;</span>
     </div>
     <div class="header-center">
-      <span class="iconfont">&#xe680;</span>
-      <span class="iconfont">&#xe674;</span>
-      <span class="iconfont">&#xe6f6;</span>
+      <router-link tag="div" to="/local">
+         <span class="iconfont font">&#xe680;</span>
+      </router-link>
+      <router-link tag="div" to="/home">
+       <span class="iconfont font">&#xe674;</span>
+      </router-link>
+      <router-link tag="div" to="/music">
+       <span class="iconfont font">&#xe6f6;</span>
+      </router-link>
     </div>
     <div class="header-right">
-      <span class="iconfont">&#xe678;</span>
+      <span class="iconfont font">&#xe678;</span>
     </div>
   </div>
 </div>
@@ -18,33 +24,43 @@
 
 <script>
 export default {
-  name: 'Test'
+  name: 'HomeHeader'
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
   @import '~styles/varibles.styl'
     .header
       display flex
       justify-content space-between
       align-items center
       background #DF433A
+      color #bfbfbf
       height 45px
       width 100%
       .header-left
         display flex
         justify-content center
         align-items center
+        color white
         width px2Rem(50px)
-        font-size px2Rem(24px)
+        .font
+          font-size px2Rem(18px)
       .header-center
+        width px2Rem(120px)
         display flex
         justify-content space-between
-        width px2Rem(120px)
+        align-items center
+          .font
+            font-size px2Rem(18px)
+      .router-link-active
+        color white
       .header-right
         display flex
         justify-content center
         align-items center
+        color white
         width px2Rem(50px)
-        font-size px2Rem(24px)
+        .font
+          font-size px2Rem(18px)
 </style>

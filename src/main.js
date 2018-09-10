@@ -4,13 +4,16 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import fastClick from 'fastclick'
+import axios from 'axios'
 import 'styles/reset.css'
 import 'styles/border.css'
 import 'styles/iconfont.css'
 
 Vue.config.productionTip = false
 fastClick.attach(document.body)
-// zhushi
+let loading = document.getElementById('ajaxLoading')
+Vue.prototype.$isShowLoading = loading
+Vue.prototype.$http = axios
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

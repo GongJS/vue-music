@@ -1,16 +1,21 @@
 <template>
   <div id="app">
     <home-header />
-    <router-view/>
+    <home-tab />
+    <keep-alive>
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 
 <script>
 import HomeHeader from '@/components/Header'
+import HomeTab from '@/components/Tab'
 export default {
   name: 'App',
   components: {
-    HomeHeader
+    HomeHeader,
+    HomeTab
   }
 }
 </script>
