@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>travel</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  <script type="text/javascript">
+  	//获取视窗高度
+  	const htmlWidth = document.documentElement.clientWidth || document.body.clientWidth;
+    //获取视窗高度
+    console.log(htmlWidth)
+    const htmlDom = document.getElementsByTagName('html')[0];
+    
+    htmlDom.style.fontSize = htmlWidth / 10 + 'px';
+  </script>  
+  </body>
+</html>
