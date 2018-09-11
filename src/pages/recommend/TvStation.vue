@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="title">
-      <span>推荐歌单</span>
+      <span>推荐电台</span>
     </div>
     <div class="items">
        <div v-for="item of items" :key="item.id" class="item">
@@ -14,16 +14,16 @@
 
 <script>
 export default {
-  name: 'SongSheet',
+  name: 'TvStation',
   data () {
     return {
       items: []
     }
   },
   methods: {
-    // 获取推荐歌单
+    // 获取最新歌曲
     async request () {
-      this.$http.get('personalized')
+      this.$http.get('/personalized/djprogram')
         .then(res => {
           if (res.status === 200) {
             for (let i = 0; i < 6; i++) {
