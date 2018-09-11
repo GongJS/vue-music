@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import fastClick from 'fastclick'
 import axios from 'axios'
+import VueLazyload from 'vue-lazyload'
 import 'styles/reset.css'
 import 'styles/border.css'
 import 'styles/iconfont.css'
@@ -14,6 +15,7 @@ fastClick.attach(document.body)
 let loading = document.getElementById('ajaxLoading')
 Vue.prototype.$isShowLoading = loading
 Vue.prototype.$http = axios
+Vue.use(VueLazyload)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -37,8 +37,8 @@ export default {
     .item
       position relative
       background #DF433A
-      width px2Rem(44px)
-      height px2Rem(44px)
+      width px2Rem(48px)
+      height px2Rem(48px)
       border-radius 50%
       display flex
       justify-content center
@@ -55,5 +55,5 @@ export default {
         position absolute
         font-size px2Rem(6px)
         height px2Rem(16px)
-        top px2Rem(50px)
+        top px2Rem(52px)
 </style>

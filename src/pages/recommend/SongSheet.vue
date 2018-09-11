@@ -2,10 +2,11 @@
   <div>
     <div class="title">
       <span>推荐歌单</span>
+      <span class="iconfont">&#xe624;</span>
     </div>
     <div class="items">
        <div v-for="item of items" :key="item.id" class="item">
-         <img :src="item.picUrl" >
+         <img v-lazy="item.picUrl" >
          <span>{{item.name}}</span>
        </div>
     </div>
@@ -39,7 +40,7 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
  @import '~styles/varibles.styl'
     .title
       display flex
@@ -49,6 +50,8 @@ export default {
       color #5A5A5A
       font-size px2Rem(18px)
       margin-left px2Rem(5px)
+      span
+        margin-right px2Rem(4px)
     .items
       display flex
       justify-content space-between
@@ -67,5 +70,4 @@ export default {
           height px2Rem(30px)
           font-size px2Rem(8px)
           color #8F8F8F
-
 </style>

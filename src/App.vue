@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <home-header />
-    <home-tab />
+    <home-header v-show="this.$route.meta.showHeader"/>
+    <home-tab v-show="this.$route.meta.showTab"/>
     <keep-alive>
       <router-view/>
     </keep-alive>
