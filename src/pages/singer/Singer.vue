@@ -1,17 +1,17 @@
 <template>
-<div class="wrapper" @click="cancel">
+<div class="wrapper" @click="cancel" >
   <div>
-    <div class="header">
+    <div class="header" :style="{opacity: opacity}">
       <router-link to="/recommend">
         <span class="iconfont font">&#xe72a;</span>
       </router-link>
       <span>华语男歌手-热门歌手</span>
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
-    <div class="singer">
-      <scroll class="singer-content" :data="items">
+    <div class="singer" :style="{opacity: opacity}">
+      <scroll class="singer-content" :data="items" @scroll="scroll" :listenScroll="listenScroll">
         <div>
-          <div v-for="item of items" :key="item.img1v1Id" class="item">
+          <div v-for="item of items" :key="item.id" class="item" @click="selectSinger">
             <img v-lazy="item.img1v1Url">
             <span>{{item.name}}</span>
             <div v-if="item.accountId" class="item-right">
@@ -23,8 +23,8 @@
       </scroll>
     </div>
   </div>
-  <div v-if="isFilter" class="filter-wrapper">
-     <singer-filter />
+  <div v-if="isFilter" class="filter-wrapper" @touchstart="touch">
+     <singer-filter v-on:updateList="updateList" > </singer-filter>
   </div>
 </div>
 </template>
@@ -41,37 +41,113 @@ export default {
   data () {
     return {
       items: [],
-      isFilter: false
+      hotItems: [],
+      classifyItems: [],
+      isFilter: false,
+      state: '热门歌手',
+      opacity: 1,
+      concat: false,
+      offset: 0,
+      height: -400
     }
   },
   methods: {
     // 获取热门歌手
-    async request () {
-      this.$http.get('/top/artists')
+    async requestHot () {
+      this.$http.get(`/top/artists?offset=${this.offset}&limit=20`)
         .then(res => {
+          let newItems = []
           if (res.status === 200) {
-            console.log(res)
-            for (let i = 0; i < 50; i++) {
-              this.items.push(res.data.artists[i])
+            for (let i = 0; i < res.data.artists.length; i++) {
+              newItems.push(res.data.artists[i])
             }
+            if (this.concat === false) {
+              this.hotItems = []
+            } else {
+              this.height = this.height - res.data.artists.length * 53
+            }
+            this.isFilter = false
+            this.opacity = 1
+            this.hotItems = this.hotItems.concat(newItems)
+            this.items = this.hotItems
           }
         })
     },
+    // 按字母排列获取歌手
+    async requestClassify (params) {
+      this.$http.get(`/artist/list?cat=1001&initial=${params}&offset=${this.offset}&limit=20`)
+        .then(res => {
+          let newItems = []
+          if (res.status === 200) {
+            if (this.concat === false) {
+              this.classifyItems = []
+            }
+            for (let i = 0; i < res.data.artists.length; i++) {
+              newItems.push(res.data.artists[i])
+            }
+            this.classifyItems = this.classifyItems.concat(newItems)
+            this.items = this.classifyItems
+          }
+        })
+    },
+    updateList (data) {
+      this.state = data
+      this.isFilter = false
+      this.opacity = 1
+      this.concat = false
+      this.height = -400
+      if (data === '热门歌手') {
+        this.requestHot()
+      } else {
+        this.requestClassify(data)
+      }
+    },
     filter () {
-      console.log(2)
       this.isFilter = !this.isFilter
+      if (this.opacity === 1) {
+        this.opacity = 0.4
+      } else {
+        this.opacity = 1
+      }
     },
     cancel () {
-      console.log(3)
       if (this.isFilter === false) {
-
       } else {
         this.isFilter = false
+        this.opacity = 1
       }
+    },
+    touch () {
+      this.isFilter = false
+      this.opacity = 1
+    },
+    scroll (pos) {
+      console.log(pos)
+      let data = this.state
+      if (pos.y <= this.height) {
+        this.offset = this.offset + 1
+        this.concat = true
+        if (data === '热门歌手') {
+          this.requestHot()
+        } else {
+          this.requestClassify(data)
+        }
+      } else if (pos.y >= 20) {
+        this.offset = 0
+        if (data === '热门歌手') {
+          this.requestHot()
+        } else {
+          this.requestClassify(data)
+        }
+      } else {}
+    },
+    selectSinger () {
+
     }
   },
   created () {
-    this.request()
+    this.requestHot()
+    this.listenScroll = true
   }
 }
 </script>

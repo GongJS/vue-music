@@ -1,9 +1,15 @@
 <template>
-  <div class="filter">
-    <div class="title">请选择</div>
-    <scroll :data="alphabets" class="filter-content">
+  <div class="filter" @touchstart.stop>
+    <div class="title" @click.stop>请选择</div>
+    <scroll :data="alphabets" class="filter-content"
+      :listenScroll="listenScroll"
+      @scroll="scroll"
+    >
       <div>
-          <div v-for="(item,index) of alphabets" :key="index" class="item">
+          <div v-for="(item,index) of alphabets" class="item"
+             :key="index"
+             @click.stop="selectItem(item)"
+           >
            {{item}}
           </div>
       </div>
@@ -18,9 +24,34 @@ export default {
   components: {
     Scroll
   },
+  data () {
+    return {
+      state: ''
+    }
+  },
+  methods: {
+    selectItem (data) {
+      console.log(data)
+      if (data === this.state) {
+        return
+      }
+      if (data === '热门歌手') {
+        this.state = '热门歌手'
+        this.$emit('updateList', data)
+      } else {
+        this.state = data
+        let params = data.toLocaleLowerCase()
+        this.$emit('updateList', params)
+      }
+    },
+    scroll (pos) {
+      console.log(pos)
+    }
+  },
   created () {
-    this.alphabets = ['热门选择', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+    this.alphabets = ['热门歌手', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
       'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    this.listenScroll = true
   }
 }
 </script>
