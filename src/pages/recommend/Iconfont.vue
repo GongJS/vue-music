@@ -31,7 +31,7 @@ export default {
   .wrapper
     display flex
     justify-content space-around
-    height 90px
+    height px2Rem(90px)
     width 100%
     border-bottom px2Rem(1px) solid #EFF3F4
     .item
@@ -47,13 +47,12 @@ export default {
       color white
       box-shadow 2px 2px 2px #888888
       margin-top px2Rem(10px)
-      margin
       .font
         font-size px2Rem(22px)
       p
         color #5c5c5c
         position absolute
-        font-size px2Rem(6px)
+        font-size px2Rem(10px)
         height px2Rem(16px)
         top px2Rem(52px)
 </style>

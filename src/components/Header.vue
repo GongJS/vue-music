@@ -36,7 +36,7 @@ export default {
       align-items center
       background #DF433A
       color #bfbfbf
-      height 45px
+      height px2Rem(45px)
       width 100%
       .header-left
         display flex
@@ -51,8 +51,8 @@ export default {
         display flex
         justify-content space-between
         align-items center
-          .font
-            font-size px2Rem(18px)
+        .font
+          font-size px2Rem(18px)
       .router-link-active
         color white
       .header-right

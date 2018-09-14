@@ -9,9 +9,14 @@
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
     <div class="singer" :style="{opacity: opacity}">
-      <scroll class="singer-content" :data="items" @scroll="scroll" :listenScroll="listenScroll">
+      <scroll class="singer-content"
+        :data="items"
+        @scroll="scroll"
+        :listenScroll="listenScroll"
+        :probeType="probeType"
+      >
         <div>
-          <div v-for="item of items" :key="item.id" class="item" @click="selectSinger">
+          <div v-for="item of items" :key="item.id" class="item" @click="selectSinger(item.id)">
             <img v-lazy="item.img1v1Url">
             <span>{{item.name}}</span>
             <div v-if="item.accountId" class="item-right">
@@ -24,8 +29,9 @@
     </div>
   </div>
   <div v-if="isFilter" class="filter-wrapper" @touchstart="touch">
-     <singer-filter v-on:updateList="updateList" > </singer-filter>
+     <singer-filter v-on:updateList="updateList" ></singer-filter>
   </div>
+  <router-view></router-view>
 </div>
 </template>
 
@@ -44,17 +50,17 @@ export default {
       hotItems: [],
       classifyItems: [],
       isFilter: false,
+      concat: false,
       state: '热门歌手',
       opacity: 1,
-      concat: false,
       offset: 0,
-      height: -400
+      scrollY: -400
     }
   },
   methods: {
     // 获取热门歌手
     async requestHot () {
-      this.$http.get(`/top/artists?offset=${this.offset}&limit=20`)
+      this.$http.get(`/top/artists?offset=1&limit=20`)
         .then(res => {
           let newItems = []
           if (res.status === 200) {
@@ -64,7 +70,7 @@ export default {
             if (this.concat === false) {
               this.hotItems = []
             } else {
-              this.height = this.height - res.data.artists.length * 53
+              this.scrollY = this.scrollY - res.data.artists.length * 53
             }
             this.isFilter = false
             this.opacity = 1
@@ -79,11 +85,13 @@ export default {
         .then(res => {
           let newItems = []
           if (res.status === 200) {
-            if (this.concat === false) {
-              this.classifyItems = []
-            }
             for (let i = 0; i < res.data.artists.length; i++) {
               newItems.push(res.data.artists[i])
+            }
+            if (this.concat === false) {
+              this.classifyItems = []
+            } else {
+              this.scrollY = this.scrollY - res.data.artists.length * 53
             }
             this.classifyItems = this.classifyItems.concat(newItems)
             this.items = this.classifyItems
@@ -95,7 +103,7 @@ export default {
       this.isFilter = false
       this.opacity = 1
       this.concat = false
-      this.height = -400
+      this.scrollY = -400
       if (data === '热门歌手') {
         this.requestHot()
       } else {
@@ -122,9 +130,8 @@ export default {
       this.opacity = 1
     },
     scroll (pos) {
-      console.log(pos)
       let data = this.state
-      if (pos.y <= this.height) {
+      if (pos.y <= this.scrollY) {
         this.offset = this.offset + 1
         this.concat = true
         if (data === '热门歌手') {
@@ -134,6 +141,7 @@ export default {
         }
       } else if (pos.y >= 20) {
         this.offset = 0
+        this.concat = false
         if (data === '热门歌手') {
           this.requestHot()
         } else {
@@ -141,13 +149,17 @@ export default {
         }
       } else {}
     },
-    selectSinger () {
-
+    selectSinger (id) {
+      console.log(id)
+      this.$router.push({
+        path: `/singer/${id}`
+      })
     }
   },
   created () {
     this.requestHot()
     this.listenScroll = true
+    this.probeType = 2
   }
 }
 </script>
@@ -180,7 +192,7 @@ export default {
     .singer
       position fixed
       width 100%
-      top 45px
+      top px2Rem(45px)
       bottom 0
       .singer-content
         height: 100%

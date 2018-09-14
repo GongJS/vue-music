@@ -24,6 +24,10 @@ export default {
     listenScroll: {
       type: Boolean,
       default: false
+    },
+    startScroll: {
+      type: Boolean,
+      default: true
     }
 
   },
@@ -63,6 +67,11 @@ export default {
       this.$nextTick(() => {
         this.refresh()
       })
+    },
+    startScroll () {
+      if (this.startScroll === false) {
+        this.disable()
+      }
     }
   }
 }

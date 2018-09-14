@@ -40,7 +40,7 @@ export default {
     .recommend
       position fixed
       width 100%
-      top 90px
+      top px2Rem(90px)
       bottom 0
       .recommend-content
         height: 100%

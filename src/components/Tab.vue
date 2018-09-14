@@ -25,15 +25,15 @@ export default {}
     align-items center
     background #DF433A
     color #bfbfbf
-    height 45px
+    height px2Rem(45px)
     font-size: px2Rem(14px)
     .tab-item
       flex: 1
       text-align: center
       .tab-link
-        padding-bottom: 5px
+        padding-bottom: px2Rem(5px)
       &.router-link-active
         .tab-link
           color white
-          border-bottom 2px solid white
+          border-bottom px2Rem(2px) solid white
 </style>

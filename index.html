@@ -54,13 +54,12 @@
       </div>
     </div>
   <script type="text/javascript">
-  	//获取视窗高度
+  	//获取视窗宽度
   	const htmlWidth = document.documentElement.clientWidth || document.body.clientWidth;
-    //获取视窗高度
-  
+    //获取网页html元素
     const htmlDom = document.getElementsByTagName('html')[0];
-    
     htmlDom.style.fontSize = htmlWidth / 10 + 'px';
+    console.log(htmlDom.style.fontSize)
   </script>  
   </body>
 </html>
