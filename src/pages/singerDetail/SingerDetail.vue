@@ -57,14 +57,16 @@ export default {
     scrollY () {
       let translateY = Math.max(this.minTranslateY, this.scrollY)
       let zIndex = 0
-      console.log(77, translateY)
-      if (translateY > -210) {
-        this.$refs.tab.$el.style.transform = `translate3d(0,${translateY}px,0)`
-      }
-      console.log(777, this.scrollY, this.minTranslateY)
-      if (this.scrollY < this.minTranslateY) {
+      let scale = 1
+      const percent = Math.abs(this.scrollY / this.imageHeight)
+      this.$refs.tab.$el.style.transform = `translate3d(0,${translateY}px,0)`
+      if (this.scrollY > 0) {
+        scale = 1 + percent
         zIndex = 10
-        this.$refs.tab.$el.style.transform = 'translate3d(0,-30px,0)'
+      }
+      if (this.scrollY < this.minTranslateY || this.scrollY === this.minTranslateY) {
+        zIndex = 10
+        this.$refs.tab.$el.style.transform = 'translate3d(0,-40px,0)'
         this.$refs.bgImage.style.paddingTop = 0
         this.$refs.bgImage.style.height = `${77}px`
       } else {
@@ -72,6 +74,7 @@ export default {
         this.$refs.bgImage.style.height = 0
       }
       this.$refs.bgImage.style.zIndex = zIndex
+      this.$refs.bgImage.style.transform = `scale(${scale})`
     }
   },
   methods: {

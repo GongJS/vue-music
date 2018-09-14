@@ -1,5 +1,5 @@
 <template>
-<div class="wrapper" @click="cancel" >
+<div class="wrapper" @click="cancel">
   <div>
     <div class="header" :style="{opacity: opacity}">
       <router-link to="/recommend">
@@ -8,7 +8,7 @@
       <span>华语男歌手-热门歌手</span>
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
-    <div class="singer" :style="{opacity: opacity}">
+    <div class="singer" :style="{opacity: opacity, display: isHidden}">
       <scroll class="singer-content"
         :data="items"
         @scroll="scroll"
@@ -52,9 +52,19 @@ export default {
       isFilter: false,
       concat: false,
       state: '热门歌手',
+      isHidden: 'block',
       opacity: 1,
       offset: 0,
       scrollY: -400
+    }
+  },
+  watch: {
+    '$route' () {
+      if (this.isHidden === 'block') {
+        this.isHidden = 'none'    
+      } else {
+        this.isHidden = 'block'
+      }
     }
   },
   methods: {
@@ -150,7 +160,6 @@ export default {
       } else {}
     },
     selectSinger (id) {
-      console.log(id)
       this.$router.push({
         path: `/singer/${id}`
       })
@@ -160,6 +169,10 @@ export default {
     this.requestHot()
     this.listenScroll = true
     this.probeType = 2
+    console.log(66666)
+  },
+  activated () {
+    console.log(98)
   }
 }
 </script>
@@ -194,6 +207,7 @@ export default {
       width 100%
       top px2Rem(45px)
       bottom 0
+      display none
       .singer-content
         height: 100%
         overflow: hidden
