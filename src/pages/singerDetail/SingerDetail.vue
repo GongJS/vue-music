@@ -1,9 +1,15 @@
 <template>
     <div class="singer-detail">
-      <div class="back" @click="back">
-        xxxx
+      <div class="header" @click="back">
+         <div class="back">
+          <span class="iconfont font">&#xe72a;</span>
+          <span class="title">{{name}}</span>
+        </div>
+        <div class="share">
+          <span class="iconfont font">&#xe643;</span>
+        </div>
       </div>
-      <h1  class="title">{{name}} </h1>
+
       <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter" ref="filter"></div>
       </div>
@@ -20,7 +26,7 @@
         <div>
           <collect></collect>
           <div class="song-list-wrapper">
-            <song-list :songs="songs"></song-list>
+            <song-list :songs="songs" :name="name"></song-list>
           </div>
         </div>
       </scroll>
@@ -54,6 +60,14 @@ export default {
     }
   },
   watch: {
+    '$route' (to, from) {
+      console.log(77, to, from)
+      if (to.path !== '/singer/') {
+
+      } else {
+
+      }
+    },
     scrollY () {
       let translateY = Math.max(this.minTranslateY, this.scrollY)
       let zIndex = 0
@@ -82,6 +96,7 @@ export default {
     async requestSinger (id) {
       this.$http.get(`/artists?id=${id}`)
         .then(res => {
+          console.log(res)
           let items = []
           if (res.status === 200) {
             this.bgImage = res.data.artist.picUrl
@@ -97,7 +112,9 @@ export default {
       this.scrollY = pos.y
     },
     back () {
-      console.log(2)
+      this.$router.push({
+        path: '/singer/'
+      })
     }
 
   },
@@ -112,6 +129,7 @@ export default {
       this.imageHeight = this.$refs.bgImage.clientHeight
       this.minTranslateY = -this.imageHeight + 40
       this.$refs.list.$el.style.top = `${this.imageHeight + 40}px`
+      this.$emit('hiddenList') // 通知父组件隐藏歌手列表
     })
   }
 }
@@ -126,21 +144,29 @@ export default {
     left 0
     right 0
     bottom 0
-    .back
+    .header
       position absolute
+      display flex
+      justify-content space-between
       top: 0
-      left: 6px
+      left: 10px
+      right: 6px
       z-index: 50
-    .title
-      position: absolute
-      top: 0
-      left: 10%
-      z-index: 40
-      width: 80%
-      text-align: center
-      line-height: 40px
-      font-size: 14px
-      color: red
+      color white
+      line-height 40px
+      font-size 16px
+      .back
+        display flex
+        justify-content space-around
+        .font
+          font-size  20px
+          margin-right 10px
+      .share
+        display flex
+        justify-content center
+        width 40px
+        .font
+          font-size  20px
     .bg-image
       position: relative
       width: 100%
@@ -157,7 +183,7 @@ export default {
       top: 0
       bottom: 0
       width: 100%
-      margin-top px2Rem(-1px)
+      margin-top -1px
     .tab
       background white
       z-index 40

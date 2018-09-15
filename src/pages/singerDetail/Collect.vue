@@ -1,12 +1,12 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper border-bottom">
     <div class="item">
-       <span class="iconfont font">&#xe689;</span>
-       <p class="">收藏热门50单曲</p>
+       <span class="iconfont font">&#xe62d;</span>
+       <p style="margin-left:7px;">收藏热门50单曲</p>
     </div>
      <div class="item">
-       <span class="iconfont font">&#xe689;</span>
-       <p class="">多选</p>
+       <span class="iconfont font">&#xe666;</span>
+       <p style="margin-left:2px;color:red;">多选</p>
     </div>
   </div>
 </template>
@@ -25,9 +25,8 @@ export default {
     justify-content space-between
     align-content center
     box-sizing border-box
-    height px2Rem(45px)
+    height 45px
     width 100%
-    border-bottom px2Rem(1px) solid #EFF3F4
     color #838383
     background white
     .item
@@ -35,11 +34,13 @@ export default {
       justify-content center
       align-items center
       .font
-        margin-left px2Rem(10px)
+        margin-left 5px
+        font-size 18px
+        color red
       p
-        font-size px2Rem(10px)
-        margin-left px2Rem(10px)
-        margin-right px2Rem(10px)
+        font-size 10px
+        margin-left 10px
+        margin-right 10px
       p:nth-child(1)
-        margin-left px2Rem(20)px
+        margin-left 20px
 </style>

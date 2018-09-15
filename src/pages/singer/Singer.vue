@@ -1,7 +1,7 @@
 <template>
 <div class="wrapper" @click="cancel">
   <div>
-    <div class="header" :style="{opacity: opacity}">
+    <div class="header" :style="{opacity: opacity, display: isHidden}" >
       <router-link to="/recommend">
         <span class="iconfont font">&#xe72a;</span>
       </router-link>
@@ -31,7 +31,7 @@
   <div v-if="isFilter" class="filter-wrapper" @touchstart="touch">
      <singer-filter v-on:updateList="updateList" ></singer-filter>
   </div>
-  <router-view></router-view>
+  <router-view @hiddenList="hiddenList"></router-view>
 </div>
 </template>
 
@@ -59,9 +59,10 @@ export default {
     }
   },
   watch: {
-    '$route' () {
-      if (this.isHidden === 'block') {
-        this.isHidden = 'none'    
+    // 监听路由跳转，隐藏歌手列表
+    '$route' (to, from) {
+      if (to.path !== '/singer/') {
+
       } else {
         this.isHidden = 'block'
       }
@@ -163,16 +164,17 @@ export default {
       this.$router.push({
         path: `/singer/${id}`
       })
+      this.isHidden = 'none'
+    },
+    // 子组件通知父组件隐藏歌手列表
+    hiddenList () {
+      this.isHidden = 'none'
     }
   },
   created () {
     this.requestHot()
     this.listenScroll = true
     this.probeType = 2
-    console.log(66666)
-  },
-  activated () {
-    console.log(98)
   }
 }
 </script>
@@ -185,27 +187,25 @@ export default {
   justify-content center
   align-items center
     .header
-      display flex
-      align-items center
-      position relative
-      height px2Rem(45px)
+      height 45px
       background #DF433A
       width 100%
+      line-height 45px
       .font
-        font-size px2Rem(18px)
+        font-size 18px
       .filter
         position absolute
-        right px2Rem(5px)
+        right 5px
       span
         display inline-block
-        margin-left px2Rem(10px)
-        margin-right px2Rem(5px)
-        font-size px2Rem(12px)
+        margin-left 10px
+        margin-right 5px
+        font-size 12px
         color white
     .singer
       position fixed
       width 100%
-      top px2Rem(45px)
+      top 45px
       bottom 0
       display none
       .singer-content
@@ -214,31 +214,31 @@ export default {
         .item
           display flex
           align-items center
-          height px2Rem(52px)
+          height 52px
           width 100%
-          border-bottom px2Rem(1px) solid #F9F5F5
+          border-bottom 1px solid #F9F5F5
           position relative
           span
-            margin-left px2Rem(10px)
+            margin-left 10px
           .item-right
             display flex
             align-items center
             position absolute
-            right px2Rem(5px)
+            right 5px
             .font
               color #DF433A
-              font-size px2Rem(18px)
+              font-size 18px
             span:nth-child(2)
-              font-size px2Rem(2px)
+              font-size 2px
               display inline-block
-              margin-right px2Rem(15px)
-              margin-left px2Rem(5px)
+              margin-right 15px
+              margin-left 5px
               color #BEBEBE
           img
-            height px2Rem(46px)
-            width px2Rem(46px)
-            margin-left px2Rem(5px)
-            border-radius px2Rem(4px)
+            height 46px
+            width 46px
+            margin-left 5px
+            border-radius 4px
     .filter-wrapper
       position absolute
       display flex

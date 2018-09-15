@@ -46,12 +46,12 @@ export default {
       display flex
       align-items center
       width 100%
-      height px2Rem(50px)
+      height 50px
       color #5A5A5A
-      font-size px2Rem(18px)
-      margin-left px2Rem(5px)
+      font-size 18px
+      margin-left 5px
       span
-        margin-right px2Rem(4px)
+        margin-right 4px
     .items
       display flex
       justify-content space-between
@@ -66,9 +66,9 @@ export default {
           height 33vw
         span
           display inline-block
-          margin-top px2Rem(5px)
-          height px2Rem(30px)
-          font-size px2Rem(8px)
+          margin-top 5px
+          height 30px
+          font-size 8px
           color #8F8F8F
 
 </style>

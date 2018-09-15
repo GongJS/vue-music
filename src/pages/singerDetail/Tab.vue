@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper" ref="tab" @touchmove="touchmove">
+  <div class="wrapper border-bottom" ref="tab" @touchmove="touchmove">
     <div class="item" @click="test">
        <p class="">热门演唱</p>
     </div>
@@ -38,11 +38,9 @@ export default {
     justify-content space-around
     align-content center
     box-sizing border-box
-    height px2Rem(40px)
+    height 40px
     width 100%
-    border-bottom px2Rem(1px) solid #D4C0C0
-    margin-bottom  px2Rem(-1px)
-    border-top px2Rem(1px) solid #EFF3F4
+    border-top 1px solid #EFF3F4
     border-radius 0.5rem 0.5rem 0 0
     background white
     .item
@@ -51,5 +49,5 @@ export default {
       align-items center
       color #D33F40
       p
-        font-size px2Rem(10px)
+        font-size 10px
 </style>

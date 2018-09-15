@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper border-bottom">
     <div class="item">
       <span class="iconfont font">&#xe689;</span>
        <p class="">私人FM</p>
@@ -31,14 +31,13 @@ export default {
   .wrapper
     display flex
     justify-content space-around
-    height px2Rem(90px)
+    height 90px
     width 100%
-    border-bottom px2Rem(1px) solid #EFF3F4
     .item
       position relative
       background #DF433A
-      width px2Rem(48px)
-      height px2Rem(48px)
+      width 48px
+      height 48px
       border-radius 50%
       display flex
       justify-content center
@@ -46,13 +45,13 @@ export default {
       flex-wrap wrap
       color white
       box-shadow 2px 2px 2px #888888
-      margin-top px2Rem(10px)
+      margin-top 10px
       .font
-        font-size px2Rem(22px)
+        font-size 22px
       p
         color #5c5c5c
         position absolute
-        font-size px2Rem(10px)
-        height px2Rem(16px)
-        top px2Rem(52px)
+        font-size 10px
+        height 16px
+        top 52px
 </style>
