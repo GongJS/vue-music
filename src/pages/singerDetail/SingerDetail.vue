@@ -6,10 +6,25 @@
           <span class="title">{{name}}</span>
         </div>
         <div class="share">
-          <span class="iconfont font">&#xe643;</span>
+          <div class="hidden" v-show="isHidden === 'none'">
+            <span class="iconfont font">&#xe632;</span>
+            <span>收藏</span>
+          </div>
+          <div>
+            <span class="iconfont font">&#xe643;</span>
+          </div>
         </div>
       </div>
-
+      <div class="homepage" ref="homepage" :style="{display: isHidden}">
+        <p class="collect">
+          <span class="iconfont font">&#xe632;</span>
+          <span>收藏</span>
+        </p>
+        <p class="page">
+          <span class="iconfont font">&#xe607;</span>
+          <span>个人主页</span>
+        </p>
+      </div>
       <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter" ref="filter"></div>
       </div>
@@ -51,7 +66,8 @@ export default {
       songs: [],
       bgImage: '',
       name: '',
-      scrollY: 0
+      scrollY: 0,
+      isHidden: ''
     }
   },
   computed: {
@@ -60,20 +76,19 @@ export default {
     }
   },
   watch: {
-    '$route' (to, from) {
-      console.log(77, to, from)
-      if (to.path !== '/singer/') {
-
-      } else {
-
-      }
-    },
     scrollY () {
       let translateY = Math.max(this.minTranslateY, this.scrollY)
       let zIndex = 0
       let scale = 1
+      let brightness = 1
+      let opacity = 1
       const percent = Math.abs(this.scrollY / this.imageHeight)
+      brightness = 1 - percent + 0.2 // 保留一点图片亮度
+      opacity = 1 - percent
+      this.$refs.bgImage.style.filter = `brightness(${brightness})`
       this.$refs.tab.$el.style.transform = `translate3d(0,${translateY}px,0)`
+      this.$refs.homepage.style.transform = `translate3d(0,${translateY}px,0)`
+      this.$refs.homepage.style.opacity = `${opacity}`
       if (this.scrollY > 0) {
         scale = 1 + percent
         zIndex = 10
@@ -82,8 +97,10 @@ export default {
         zIndex = 10
         this.$refs.tab.$el.style.transform = 'translate3d(0,-40px,0)'
         this.$refs.bgImage.style.paddingTop = 0
+        this.isHidden = 'none'
         this.$refs.bgImage.style.height = `${77}px`
       } else {
+        this.isHidden = ''
         this.$refs.bgImage.style.paddingTop = '70%'
         this.$refs.bgImage.style.height = 0
       }
@@ -129,6 +146,7 @@ export default {
       this.imageHeight = this.$refs.bgImage.clientHeight
       this.minTranslateY = -this.imageHeight + 40
       this.$refs.list.$el.style.top = `${this.imageHeight + 40}px`
+      this.$refs.homepage.style.top = `${this.imageHeight - 40}px`
       this.$emit('hiddenList') // 通知父组件隐藏歌手列表
     })
   }
@@ -163,16 +181,53 @@ export default {
           margin-right 10px
       .share
         display flex
-        justify-content center
-        width 40px
+        justify-content space-around
+        align-items center
+        .hidden
+          display flex
+          justify-content space-around
+          align-items center
+          background #E14537
+          height 25px
+          width 50px
+          border-radius 0.5rem 0.5rem 0.5rem 0.5rem
+          font-size 12px
+          margin-right 15px
         .font
-          font-size  20px
+          font-size  16px
+    .homepage
+      position absolute
+      z-index 50
+      display flex
+      justify-content space-around
+      align-items center
+      height 40px
+      left 20%
+      right 20%
+      margin 0 auto
+      background transparent
+      color white
+      .collect
+        background #E14537
+        display flex
+        justify-content space-around
+        align-items center
+        width 80px
+        height 30px
+        border-radius 0.5rem 0.5rem 0.5rem 0.5rem
+      .page
+        display flex
+        justify-content space-around
+        align-items center
+        width 80px
+        height 30px
+        border-radius 0.5rem 0.5rem 0.5rem 0.5rem
     .bg-image
-      position: relative
-      width: 100%
-      height: 0
-      padding-top: 70%
-      transform-origin: top
+      position relative
+      width 100%
+      height 0
+      padding-top 70%
+      transform-origin top
       background-size: cover
     .tab
       position: relative

@@ -64,7 +64,7 @@ export default {
     width 80%
     top 10px
     bottom 10px
-    box-shadow 2px 2px 2px #c8c8c8
+    box-shadow 1px 1px 1px #f9f5f5
     overflow: hidden
     .title
       height 40px

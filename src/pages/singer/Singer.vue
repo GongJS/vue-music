@@ -1,14 +1,18 @@
 <template>
 <div class="wrapper" @click="cancel">
   <div>
-    <div class="header" :style="{opacity: opacity, display: isHidden}" >
+    <div class="header" :style="{display: isHidden}" >
       <router-link to="/recommend">
         <span class="iconfont font">&#xe72a;</span>
       </router-link>
       <span>华语男歌手-热门歌手</span>
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
-    <div class="singer" :style="{opacity: opacity, display: isHidden}">
+    <div class="masklayer"
+      ref="masklayer"
+      v-show="isFilter"
+    ></div>
+    <div class="singer" :style="{display: isHidden}">
       <scroll class="singer-content"
         :data="items"
         @scroll="scroll"
@@ -53,7 +57,6 @@ export default {
       concat: false,
       state: '热门歌手',
       isHidden: 'block',
-      opacity: 1,
       offset: 0,
       scrollY: -400
     }
@@ -202,6 +205,14 @@ export default {
         margin-right 5px
         font-size 12px
         color white
+    .masklayer
+      position absolute
+      z-index 1
+      top 0
+      bottom 0
+      left 0
+      right 0
+      background-color: rgba(0,0,0,0.7)
     .singer
       position fixed
       width 100%
@@ -246,4 +257,5 @@ export default {
       align-items center
       height 100%
       width  100%
+      z-index 2
 </style>
