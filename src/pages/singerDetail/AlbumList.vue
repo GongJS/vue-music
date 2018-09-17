@@ -1,0 +1,121 @@
+<template>
+  <div class="albums">
+    <div class="header border-bottom">
+      <div class="item">
+        <p style="margin-left:7px;">按发行时间排序</p>
+      </div>
+      <div class="item">
+        <span class="iconfont font">&#xe666;</span>
+      </div>
+    </div>
+    <div v-for="item in albums" :key="item.id" class="album-list">
+      <div v-show="showMask" class="mask"></div>
+      <div class="albumImg">
+        <img v-lazy="item.blurPicUrl" />
+      </div>
+      <div class="info border-bottom">
+        <p class="name">{{item.name}}</p>
+        <p class="date">
+          {{formatTime(item.publishTime)}} 歌曲 {{item.size}}
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'AlbumList',
+  props: ['id'],
+  data () {
+    return {
+      showMask: false,
+      albums: []
+    }
+  },
+  methods: {
+    // 获取专辑
+    async requestAlbum (id) {
+      this.$http.get(`/artist/album?id=${id}`)
+        .then(res => {
+          console.log(res)
+          let items = []
+          if (res.status === 200) {
+            for (let i = 0; i < res.data.hotAlbums.length; i++) {
+              items.push(res.data.hotAlbums[i])
+            }
+            this.albums = items
+          }
+        })
+    },
+    // 时间格式转换
+    formatTime (time) {
+      let date = new Date(time)
+      return date.toLocaleString().slice(0, 8).replace(/\//, '.')
+    }
+  },
+  created () {
+    this.requestAlbum(this.id)
+  }
+}
+</script>
+<style lang="stylus" scoped>
+@import '~styles/varibles.styl'
+  .albums
+    background white
+    .header
+      display flex
+      justify-content space-between
+      align-content center
+      box-sizing border-box
+      height 45px
+      width 100%
+      color #838383
+      .item
+        display flex
+        justify-content center
+        align-items center
+        height 50px
+        .font
+          margin-right 10px
+          color #323232
+    .album-list
+      position relative
+      display flex
+      align-content center
+      margin-left 5px
+      .mask
+        position absolute
+        width 46px
+        height 46px
+        background black
+        border-radius 50%
+        left 6px
+        top 2x
+      .albumImg
+        position relative
+        z-index 2
+        display flex
+        justify-content center
+        align-content center
+        img
+          border-radius 5px
+          height 45px
+          width 45px
+      .info
+        display flex
+        align-content center
+        flex-wrap wrap
+        margin-left 10px
+        .name
+          width 100%
+          height 50%
+          line-height 25px
+          color #4E4E4E
+          font-size 12px
+        .date
+          line-height 25px
+          color #A5A5A5
+          height 50%
+          font-size 9px
+</style>

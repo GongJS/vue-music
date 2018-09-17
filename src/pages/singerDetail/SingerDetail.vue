@@ -1,5 +1,5 @@
 <template>
-    <div class="singer-detail">
+    <div class="singer-detail" >
       <div class="header" @click="back">
          <div class="back">
           <span class="iconfont font">&#xe72a;</span>
@@ -8,10 +8,10 @@
         <div class="share">
           <div class="hidden" v-show="isHidden === 'none'">
             <span class="iconfont font">&#xe632;</span>
-            <span>收藏</span>
+            <span style="font-size:0.25rem;">收藏</span>
           </div>
           <div>
-            <span class="iconfont font">&#xe643;</span>
+            <span class="iconfont font" @click.stop="share">&#xe643;</span>
           </div>
         </div>
       </div>
@@ -22,15 +22,14 @@
         </p>
         <p class="page">
           <span class="iconfont font">&#xe607;</span>
-          <span>个人主页</span>
+          <span class="user">个人主页</span>
         </p>
       </div>
       <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div class="filter" ref="filter"></div>
       </div>
-      <tab ref="tab" class="tab"></tab>
+      <tab ref="tab" class="tab" @switchTab="switchTab"></tab>
       <scroll
-        :data="songs"
+        :data="[bgImage]"
         :startScroll="startScroll"
         :listen-scroll="listenScroll"
         :probe-type="probeType"
@@ -39,9 +38,12 @@
         ref="list"
       >
         <div>
-          <collect></collect>
           <div class="song-list-wrapper">
-            <song-list :songs="songs" :name="name"></song-list>
+            <keep-alive>
+              <song-list v-if="songState" :id="id"  @singerDate="singerDate"></song-list>
+              <album-list v-else-if="albumState" :id="id"></album-list>
+              <singer-info  v-else-if="singerInfoState" :id="id" :name="name"></singer-info>
+            </keep-alive>
           </div>
         </div>
       </scroll>
@@ -50,24 +52,29 @@
 
 <script>
 import Tab from './Tab'
-import Collect from './Collect'
 import Scroll from '@/components/Scroll'
 import SongList from './SongList'
+import AlbumList from './AlbumList'
+import SingerInfo from './singerInfo'
 export default {
   name: 'SingerDetail',
   components: {
     Tab,
-    Collect,
     Scroll,
-    SongList
+    SongList,
+    AlbumList,
+    SingerInfo
   },
   data () {
     return {
-      songs: [],
+      id: 0,
       bgImage: '',
       name: '',
       scrollY: 0,
-      isHidden: ''
+      isHidden: '',
+      songState: true,
+      albumState: false,
+      singerInfoState: false
     }
   },
   computed: {
@@ -80,8 +87,8 @@ export default {
       let translateY = Math.max(this.minTranslateY, this.scrollY)
       let zIndex = 0
       let scale = 1
-      let brightness = 1
       let opacity = 1
+      let brightness = 1
       const percent = Math.abs(this.scrollY / this.imageHeight)
       brightness = 1 - percent + 0.2 // 保留一点图片亮度
       opacity = 1 - percent
@@ -95,10 +102,10 @@ export default {
       }
       if (this.scrollY < this.minTranslateY || this.scrollY === this.minTranslateY) {
         zIndex = 10
-        this.$refs.tab.$el.style.transform = 'translate3d(0,-40px,0)'
+        this.$refs.tab.$el.style.transform = 'translate3d(0,0,0)'
         this.$refs.bgImage.style.paddingTop = 0
         this.isHidden = 'none'
-        this.$refs.bgImage.style.height = `${77}px`
+        this.$refs.bgImage.style.height = `1rem`
       } else {
         this.isHidden = ''
         this.$refs.bgImage.style.paddingTop = '70%'
@@ -109,21 +116,9 @@ export default {
     }
   },
   methods: {
-    // 获取歌曲
-    async requestSinger (id) {
-      this.$http.get(`/artists?id=${id}`)
-        .then(res => {
-          console.log(res)
-          let items = []
-          if (res.status === 200) {
-            this.bgImage = res.data.artist.picUrl
-            this.name = res.data.artist.name
-            for (let i = 0; i < res.data.hotSongs.length; i++) {
-              items.push(res.data.hotSongs[i])
-            }
-            this.songs = items
-          }
-        })
+    singerDate (data) {
+      this.name = data[0]
+      this.bgImage = data[1]
     },
     scroll (pos) {
       this.scrollY = pos.y
@@ -132,21 +127,40 @@ export default {
       this.$router.push({
         path: '/singer/'
       })
+    },
+    share () {
+      console.log('分享')
+    },
+    switchTab (data) {
+      this.songState = false
+      this.albumState = false
+      this.singerInfoState = false
+      if (data === '热门演唱') {
+        this.songState = true
+      } else if (data === '专辑') {
+        this.albumState = true
+      } else if (data === '艺人信息') {
+        this.singerInfoState = true
+      } else {
+        console.log('no tab')
+      }
+      // 在第一次切换tab的时候，加载完数据滑动到原先的位置
+      setTimeout(() => {
+        this.$refs.list.scrollTo(0, this.scrollY)
+      }, 20)
     }
-
   },
   created () {
     this.probeType = 3
     this.listenScroll = true
     this.startScroll = false
-    this.requestSinger(this.$route.params.id)
+    this.id = this.$route.params.id
   },
   mounted () {
     this.$nextTick(() => {
       this.imageHeight = this.$refs.bgImage.clientHeight
-      this.minTranslateY = -this.imageHeight + 40
-      this.$refs.list.$el.style.top = `${this.imageHeight + 40}px`
-      this.$refs.homepage.style.top = `${this.imageHeight - 40}px`
+      this.minTranslateY = -this.imageHeight * 0.847
+      this.$refs.list.$el.style.top = `${this.imageHeight * 1.152}px`
       this.$emit('hiddenList') // 通知父组件隐藏歌手列表
     })
   }
@@ -191,10 +205,12 @@ export default {
           height 25px
           width 50px
           border-radius 0.5rem 0.5rem 0.5rem 0.5rem
-          font-size 12px
+          font-size 16px
           margin-right 15px
+          padding 0 5px
         .font
-          font-size  16px
+          font-size  20px
+          margin-right 10px
     .homepage
       position absolute
       z-index 50
@@ -202,6 +218,7 @@ export default {
       justify-content space-around
       align-items center
       height 40px
+      top 32%
       left 20%
       right 20%
       margin 0 auto
@@ -213,15 +230,20 @@ export default {
         justify-content space-around
         align-items center
         width 80px
-        height 30px
+        height 25px
         border-radius 0.5rem 0.5rem 0.5rem 0.5rem
+        .font
+          font-size 20px
       .page
         display flex
         justify-content space-around
         align-items center
         width 80px
-        height 30px
+        height 25px
         border-radius 0.5rem 0.5rem 0.5rem 0.5rem
+        border 1px solid white
+        .font
+          font-size 20px
     .bg-image
       position relative
       width 100%

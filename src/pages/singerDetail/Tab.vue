@@ -1,6 +1,6 @@
 <template>
-  <div class="wrapper border-bottom" ref="tab" @touchmove="touchmove">
-    <div class="item" @click="test">
+  <div class="wrapper border-bottom" @click.stop="switchTab">
+    <div class="item">
        <p class="">热门演唱</p>
     </div>
      <div class="item">
@@ -19,13 +19,20 @@
 
 export default {
   name: 'Tab',
-  mounted () {
+  data () {
+    return {
+      state: '热门演唱'
+    }
   },
   methods: {
-    touchmove () {
-    },
-    test () {
-      console.log(33)
+    switchTab (e) {
+      console.log(8989, e.target.innerHTML.toString())
+      let data = e.target.innerHTML.toString()
+      if (data === '热门演唱' || data === '专辑' || data === '视频' || data === '艺人信息') {
+        this.$emit('switchTab', e.target.innerHTML)
+      } else {
+        console.log(e)
+      }
     }
   }
 }
@@ -41,7 +48,7 @@ export default {
     height 40px
     width 100%
     border-top 1px solid #EFF3F4
-    border-radius 0.5rem 0.5rem 0 0
+    border-radius 0.2rem 0.2rem 0 0
     background white
     .item
       display flex

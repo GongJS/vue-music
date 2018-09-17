@@ -1,12 +1,12 @@
 <template>
   <div class="filter" @touchstart.stop>
-    <div class="title" @click.stop>请选择</div>
+    <div class="title" @click.stop :style="{borderBottom: hasBorder}">请选择</div>
     <scroll :data="alphabets" class="filter-content"
       :listenScroll="listenScroll"
       @scroll="scroll"
     >
       <div>
-          <div v-for="(item,index) of alphabets" class="item"
+          <div v-for="(item,index) of alphabets" class="item border-bottom"
              :key="index"
              @click.stop="selectItem(item)"
            >
@@ -26,7 +26,8 @@ export default {
   },
   data () {
     return {
-      state: ''
+      state: '',
+      hasBorder: ''
     }
   },
   methods: {
@@ -46,6 +47,11 @@ export default {
     },
     scroll (pos) {
       console.log(pos)
+      if (pos.y < -10) {
+        this.hasBorder = '1px solid #f9f5f5'
+      } else {
+        this.hasBorder = ''
+      }
     }
   },
   created () {
@@ -77,5 +83,4 @@ export default {
         height 30px
         line-height 30px
         margin-left 15px
-        border-bottom 1px solid #F9F5F5
 </style>

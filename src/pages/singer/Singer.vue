@@ -5,7 +5,7 @@
       <router-link to="/recommend">
         <span class="iconfont font">&#xe72a;</span>
       </router-link>
-      <span>华语男歌手-热门歌手</span>
+      <span>华语男歌手-{{state ? state.toLocaleUpperCase() : ''}}</span>
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
     <div class="masklayer"
@@ -74,7 +74,7 @@ export default {
   methods: {
     // 获取热门歌手
     async requestHot () {
-      this.$http.get(`/top/artists?offset=1&limit=20`)
+      this.$http.get(`/top/artists?offset=${this.offset}&limit=20`)
         .then(res => {
           let newItems = []
           if (res.status === 200) {
@@ -87,7 +87,6 @@ export default {
               this.scrollY = this.scrollY - res.data.artists.length * 53
             }
             this.isFilter = false
-            this.opacity = 1
             this.hotItems = this.hotItems.concat(newItems)
             this.items = this.hotItems
           }
@@ -115,8 +114,8 @@ export default {
     updateList (data) {
       this.state = data
       this.isFilter = false
-      this.opacity = 1
       this.concat = false
+      this.offset = 0
       this.scrollY = -400
       if (data === '热门歌手') {
         this.requestHot()
@@ -126,42 +125,45 @@ export default {
     },
     filter () {
       this.isFilter = !this.isFilter
-      if (this.opacity === 1) {
-        this.opacity = 0.4
-      } else {
-        this.opacity = 1
-      }
     },
     cancel () {
       if (this.isFilter === false) {
       } else {
         this.isFilter = false
-        this.opacity = 1
       }
     },
     touch () {
       this.isFilter = false
-      this.opacity = 1
     },
     scroll (pos) {
       let data = this.state
+      console.log(33, this.scrollY)
       if (pos.y <= this.scrollY) {
-        this.offset = this.offset + 1
+        this.offset = this.offset + 20
+        //
+        if (this.offset === 100) {
+          console.log('没有更多数据了')
+          return
+        }
         this.concat = true
         if (data === '热门歌手') {
           this.requestHot()
         } else {
           this.requestClassify(data)
         }
-      } else if (pos.y >= 20) {
+      } else if (pos.y >= 40) {
+        console.log(pos.y)
         this.offset = 0
         this.concat = false
+        this.scrollY = -400
         if (data === '热门歌手') {
           this.requestHot()
+          console.log(this.offset)
         } else {
           this.requestClassify(data)
+          console.log(this.offset)
         }
-      } else {}
+      }
     },
     selectSinger (id) {
       this.$router.push({
@@ -240,7 +242,7 @@ export default {
               color #DF433A
               font-size 18px
             span:nth-child(2)
-              font-size 2px
+              font-size 10px
               display inline-block
               margin-right 15px
               margin-left 5px
