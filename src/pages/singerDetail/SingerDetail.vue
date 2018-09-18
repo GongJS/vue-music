@@ -25,7 +25,7 @@
           <span class="user">个人主页</span>
         </p>
       </div>
-      <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="bg-image" :style="bgStyle" @load="loadImage" ref="bgImage">
       </div>
       <tab ref="tab" class="tab" @switchTab="switchTab"></tab>
       <scroll
@@ -43,6 +43,7 @@
               <song-list v-if="songState" :id="id"  @singerDate="singerDate"></song-list>
               <album-list v-else-if="albumState" :id="id"></album-list>
               <singer-info  v-else-if="singerInfoState" :id="id" :name="name"></singer-info>
+              <vedio v-else/>
             </keep-alive>
           </div>
         </div>
@@ -56,6 +57,7 @@ import Scroll from '@/components/Scroll'
 import SongList from './SongList'
 import AlbumList from './AlbumList'
 import SingerInfo from './singerInfo'
+import Vedio from './Vedio'
 export default {
   name: 'SingerDetail',
   components: {
@@ -63,7 +65,8 @@ export default {
     Scroll,
     SongList,
     AlbumList,
-    SingerInfo
+    SingerInfo,
+    Vedio
   },
   data () {
     return {
@@ -74,7 +77,9 @@ export default {
       isHidden: '',
       songState: true,
       albumState: false,
-      singerInfoState: false
+      singerInfoState: false,
+      vedioState: false,
+      showLoading: true
     }
   },
   computed: {
@@ -117,6 +122,7 @@ export default {
   },
   methods: {
     singerDate (data) {
+      this.showLoading = false
       this.name = data[0]
       this.bgImage = data[1]
     },
@@ -135,12 +141,15 @@ export default {
       this.songState = false
       this.albumState = false
       this.singerInfoState = false
+      this.vedioState = false
       if (data === '热门演唱') {
         this.songState = true
       } else if (data === '专辑') {
         this.albumState = true
       } else if (data === '艺人信息') {
         this.singerInfoState = true
+      } else if (data === '视频') {
+        this.vedioState = true
       } else {
         console.log('no tab')
       }
@@ -148,6 +157,12 @@ export default {
       setTimeout(() => {
         this.$refs.list.scrollTo(0, this.scrollY)
       }, 20)
+    },
+    loadImage () {
+      if (!this.checkloaded) {
+        this.checkloaded = true
+        this.$refs.list.refresh()
+      }
     }
   },
   created () {
@@ -168,7 +183,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
- @import '~styles/varibles.styl'
   .singer-detail
     position fixed
     z-index 100

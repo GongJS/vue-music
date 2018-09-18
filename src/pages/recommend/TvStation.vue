@@ -41,7 +41,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
- @import '~styles/varibles.styl'
     .title
       display flex
       align-items center
@@ -59,16 +58,20 @@ export default {
       flex-wrap wrap
       width 100%
       .item
-        overflow hidden
         width 32%
+        line-height 12px
         img
           width 100%
           height 33vw
         span
           display inline-block
-          margin-top 5px
-          height 30px
-          font-size 8px
+          margin 5px 2px
+          height 25px
+          font-size 10px
           color #8F8F8F
-
+          overflow hidden
+          -webkit-line-clamp 2
+          text-overflow ellipsis
+          display -webkit-box
+          -webkit-box-orient vertical
 </style>

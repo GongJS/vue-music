@@ -1,36 +1,44 @@
 <template>
   <div class="albums">
-    <div class="header border-bottom">
-      <div class="item">
-        <p style="margin-left:7px;">按发行时间排序</p>
+    <show-loading v-if="showLoading"/>
+    <div v-else>
+      <div class="header border-bottom">
+        <div class="item">
+          <p style="margin-left:7px;">按发行时间排序</p>
+        </div>
+        <div class="item">
+          <span class="iconfont font">&#xe666;</span>
+        </div>
       </div>
-      <div class="item">
-        <span class="iconfont font">&#xe666;</span>
-      </div>
-    </div>
-    <div v-for="item in albums" :key="item.id" class="album-list">
-      <div v-show="showMask" class="mask"></div>
-      <div class="albumImg">
-        <img v-lazy="item.blurPicUrl" />
-      </div>
-      <div class="info border-bottom">
-        <p class="name">{{item.name}}</p>
-        <p class="date">
-          {{formatTime(item.publishTime)}} 歌曲 {{item.size}}
-        </p>
+      <div v-for="item in albums" :key="item.id" class="album-list">
+        <div v-show="showMask" class="mask"></div>
+        <div class="albumImg">
+          <img v-lazy="item.blurPicUrl" />
+        </div>
+        <div class="info border-bottom">
+          <p class="name">{{item.name}}</p>
+          <p class="date">
+            {{formatTime(item.publishTime)}} 歌曲 {{item.size}}
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import ShowLoading from '@/components/ShowLoading'
 export default {
   name: 'AlbumList',
   props: ['id'],
+  components: {
+    ShowLoading
+  },
   data () {
     return {
       showMask: false,
-      albums: []
+      albums: [],
+      showLoading: true
     }
   },
   methods: {
@@ -45,6 +53,7 @@ export default {
               items.push(res.data.hotAlbums[i])
             }
             this.albums = items
+            this.showLoading = false
           }
         })
     },
@@ -60,9 +69,9 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-@import '~styles/varibles.styl'
   .albums
     background white
+    min-height 800px
     .header
       display flex
       justify-content space-between

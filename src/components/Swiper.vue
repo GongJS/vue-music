@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
       <swiper :options="swiperOption">
-        <swiper-slide v-for="(item, index) of imgSrc" :key="index" class="swiper-img">
+        <swiper-slide v-for="(item, index) of banners" :key="index" class="swiper-img">
           <img :src="item">
         </swiper-slide>
         <!-- Optional controls -->
@@ -19,7 +19,7 @@ export default {
     swiper,
     swiperSlide
   },
-  props: ['imgSrc'],
+  props: ['banners'],
   data () {
     return {
       swiperOption: {

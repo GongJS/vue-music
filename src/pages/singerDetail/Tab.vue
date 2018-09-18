@@ -26,7 +26,6 @@ export default {
   },
   methods: {
     switchTab (e) {
-      console.log(8989, e.target.innerHTML.toString())
       let data = e.target.innerHTML.toString()
       if (data === '热门演唱' || data === '专辑' || data === '视频' || data === '艺人信息') {
         this.$emit('switchTab', e.target.innerHTML)

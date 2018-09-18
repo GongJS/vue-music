@@ -32,7 +32,6 @@ export default {
   },
   methods: {
     selectItem (data) {
-      console.log(data)
       if (data === this.state) {
         return
       }
@@ -63,7 +62,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
- @import '~styles/varibles.styl'
   .filter
     position fixed
     background white

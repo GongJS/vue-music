@@ -1,47 +1,54 @@
 <template>
 <div class="info">
-  <div>
-    <br>
-    <p class="title">{{name}}简介</p>
-    <div class="content">
-      <p>{{info.slice(0,65)}}</p>
-      <p>{{info.slice(65)}}</p>
-      <p class="spread">完整歌手介绍 ></p>
-    </div>
-  </div>
-  <div>
-    <p class="column">相关专栏文章</p>
-    <div v-for="item in topicData" :key="item.id" class="wrapper">
-      <div>
-        <img v-lazy="item.coverUrl" />
-      </div>
-      <div class="border-bottom content">
-        <p class="heading">{{item.mainTitle}}</p>
-        <p class="author">by {{item.creator.nickname}} 阅读{{formatDate(item.readCount)}}万</p>
+  <show-loading v-if="showLoading"/>
+  <div v-else>
+    <div>
+      <br>
+      <p class="title">{{name}}简介</p>
+      <div class="content">
+        <p>{{info.slice(0,65)}}</p>
+        <p>{{info.slice(65)}}</p>
+        <p class="spread">完整歌手介绍 ></p>
       </div>
     </div>
-    <br>
-    <p class="count">全部专栏文章({{count}}) ></p>
-  </div>
-  <div>
-    <br>
-    <p class="title">相似歌手</p>
-    <div class="content">
-
+    <div>
+      <p class="column">相关专栏文章</p>
+      <div v-for="item in topicData" :key="item.id" class="wrapper">
+        <div>
+          <img v-lazy="item.coverUrl" />
+        </div>
+        <div class="border-bottom content">
+          <p class="heading">{{item.mainTitle}}</p>
+          <p class="author">by {{item.creator.nickname}} 阅读{{formatDate(item.readCount)}}万</p>
+        </div>
+      </div>
+      <br>
+      <p class="count">全部专栏文章({{count}}) ></p>
+    </div>
+    <div>
+      <br>
+      <p class="title">相似歌手</p>
+      <div class="content">
+      </div>
     </div>
   </div>
 </div>
 </template>
 
 <script>
+import ShowLoading from '@/components/ShowLoading'
 export default {
   name: 'SingerInfo',
   props: ['id', 'name'],
+  components: {
+    ShowLoading
+  },
   data () {
     return {
       info: '',
       topicData: [],
-      count: 0
+      count: 0,
+      showLoading: true
     }
   },
   methods: {
@@ -53,6 +60,7 @@ export default {
             let item = []
             this.info = res.data.briefDesc
             this.count = res.data.count
+            this.showLoading = false
             for (let i = 0; i < res.data.topicData.length; i++) {
               item.push(res.data.topicData[i])
             }

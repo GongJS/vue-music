@@ -28,6 +28,14 @@ export default {
     startScroll: {
       type: Boolean,
       default: true
+    },
+    pullup: {
+      type: Boolean,
+      default: false
+    },
+    pulldown: {
+      type: Boolean,
+      default: false
     }
 
   },
@@ -49,6 +57,15 @@ export default {
         let _this = this
         this.scroll.on('scroll', (pos) => {
           _this.$emit('scroll', pos)
+        })
+      }
+      // 是否派发滚动到底部事件，用于上拉加载
+      if (this.pullup) {
+        this.scroll.on('scrollEnd', () => {
+          // 滚动到底部
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('scrollToEnd')
+          }
         })
       }
     },

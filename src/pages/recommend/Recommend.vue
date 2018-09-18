@@ -1,8 +1,8 @@
 <template>
   <div class="recommend">
-    <scroll  class="recommend-content" :data="imgSrc">
+    <scroll  class="recommend-content" :data="banners">
       <div>
-        <home-swiper :imgSrc="imgSrc"></home-swiper>
+        <swiper :banners="banners"></swiper>
         <iconfont />
         <song-sheet />
         <tv-station />
@@ -12,16 +12,15 @@
 </template>
 
 <script>
-import HomeSwiper from '@/components/swiper'
+import Swiper from '@/components/swiper'
 import Iconfont from './Iconfont'
 import SongSheet from './SongSheet'
 import TvStation from './TvStation'
 import Scroll from '@/components/Scroll'
-import imgSrc from './imgSrc'
 export default {
   name: 'Home',
   components: {
-    HomeSwiper,
+    Swiper,
     Iconfont,
     SongSheet,
     TvStation,
@@ -29,8 +28,26 @@ export default {
   },
   data () {
     return {
-      imgSrc
+      banners: []
     }
+  },
+  methods: {
+    // 获取轮播图
+    async requestBanner (id) {
+      this.$http.get('/banner')
+        .then(res => {
+          let items = []
+          if (res.status === 200) {
+            for (let i = 0; i < res.data.banners.length; i++) {
+              items.push(res.data.banners[i].picUrl)
+            }
+            this.banners = items
+          }
+        })
+    }
+  },
+  created () {
+    this.requestBanner()
   }
 }
 </script>
