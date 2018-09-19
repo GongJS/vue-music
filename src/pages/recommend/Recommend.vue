@@ -4,8 +4,13 @@
       <div>
         <swiper :banners="banners"></swiper>
         <iconfont />
-        <song-sheet />
-        <tv-station />
+        <home-item
+          v-for="(item, index) in items"
+          :key="index"
+          :title="item.title"
+          :url="item.url"
+        >
+        </home-item>
       </div>
     </scroll>
   </div>
@@ -14,17 +19,15 @@
 <script>
 import Swiper from '@/components/swiper'
 import Iconfont from './Iconfont'
-import SongSheet from './SongSheet'
-import TvStation from './TvStation'
 import Scroll from '@/components/Scroll'
+import HomeItem from '@/components/HomeItem'
 export default {
   name: 'Home',
   components: {
     Swiper,
     Iconfont,
-    SongSheet,
-    TvStation,
-    Scroll
+    Scroll,
+    HomeItem
   },
   data () {
     return {
@@ -48,6 +51,19 @@ export default {
   },
   created () {
     this.requestBanner()
+    // 定义传给子组件homeitem数据
+    this.title = ''
+    this.url = ''
+    this.items = [
+      {
+        title: '推荐歌单',
+        url: 'personalized'
+      },
+      {
+        title: '推荐电台',
+        url: '/personalized/djprogram'
+      }
+    ]
   }
 }
 </script>
@@ -57,7 +73,7 @@ export default {
     .recommend
       position fixed
       width 100%
-      top 90px
+      top 85px
       bottom 0
       .recommend-content
         height: 100%

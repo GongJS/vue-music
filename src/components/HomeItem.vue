@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="title">
-      <span>推荐歌单</span>
+      <span>{{title}}</span>
       <span class="iconfont">&#xe624;</span>
     </div>
     <div class="items">
@@ -15,16 +15,17 @@
 
 <script>
 export default {
-  name: 'SongSheet',
+  name: 'HomeItem',
+  props: ['title', 'url'],
   data () {
     return {
       items: []
     }
   },
   methods: {
-    // 获取推荐歌单
-    async request () {
-      this.$http.get('personalized')
+    // 根据父组件传递的不同url请求不同的数据
+    async request (url) {
+      this.$http.get(url)
         .then(res => {
           if (res.status === 200) {
             for (let i = 0; i < 6; i++) {
@@ -35,7 +36,7 @@ export default {
     }
   },
   created () {
-    this.request()
+    this.request(this.url)
   }
 }
 </script>
@@ -58,8 +59,10 @@ export default {
       flex-wrap wrap
       width 100%
       .item
-        width 32%
+        width calc(33.3% - 10px)
         line-height 12px
+        padding-left 5px
+        padding-right 5px
         img
           width 100%
           height 33vw

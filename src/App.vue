@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <home-header v-show="this.$route.meta.showHeader"/>
-    <home-tab v-show="this.$route.meta.showTab"/>
+    <home-tab v-show="this.$route.meta.showTab" :tabs="tabs"/>
     <keep-alive>
       <router-view/>
     </keep-alive>
@@ -16,6 +16,13 @@ export default {
   components: {
     HomeHeader,
     HomeTab
+  },
+  created () {
+    this.tabs = [
+      {title: '推荐', path: '/recommend'},
+      {title: '歌手', path: '/singer'},
+      {title: '电台', path: '/radio'}
+    ]
   }
 }
 </script>

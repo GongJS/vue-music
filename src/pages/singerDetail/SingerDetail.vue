@@ -27,10 +27,17 @@
       </div>
       <div class="bg-image" :style="bgStyle" @load="loadImage" ref="bgImage">
       </div>
-      <tab ref="tab" class="tab" @switchTab="switchTab"></tab>
+      <singer-tab
+        ref="tab"
+        class="tab"
+        :tabs="tabs"
+        :flag="flag"
+        @switchTab="switchTab"
+      >
+      </singer-tab>
+      <transition name="list-fade">
       <scroll
         :data="[bgImage]"
-        :startScroll="startScroll"
         :listen-scroll="listenScroll"
         :probe-type="probeType"
         @scroll="scroll"
@@ -48,11 +55,12 @@
           </div>
         </div>
       </scroll>
-      </div>
+      </transition>
+    </div>
 </template>
 
 <script>
-import Tab from './Tab'
+import SingerTab from '@/components/Tab'
 import Scroll from '@/components/Scroll'
 import SongList from './SongList'
 import AlbumList from './AlbumList'
@@ -61,21 +69,21 @@ import Vedio from './Vedio'
 export default {
   name: 'SingerDetail',
   components: {
-    Tab,
     Scroll,
     SongList,
     AlbumList,
     SingerInfo,
-    Vedio
+    Vedio,
+    SingerTab
   },
   data () {
     return {
-      id: 0,
-      bgImage: '',
-      name: '',
-      scrollY: 0,
-      isHidden: '',
-      songState: true,
+      id: 0, // 歌手id
+      bgImage: '', // 背景图地址
+      name: '', // 歌手名称
+      scrollY: 0, // 滚轮位置
+      isHidden: '', // 控制“收藏” “个人主页” 显示
+      songState: true, // tab切换状态  热门演唱  专辑  视频  个人信息
       albumState: false,
       singerInfoState: false,
       vedioState: false,
@@ -101,10 +109,12 @@ export default {
       this.$refs.tab.$el.style.transform = `translate3d(0,${translateY}px,0)`
       this.$refs.homepage.style.transform = `translate3d(0,${translateY}px,0)`
       this.$refs.homepage.style.opacity = `${opacity}`
+      // 向下拖动可放大图片
       if (this.scrollY > 0) {
         scale = 1 + percent
         zIndex = 10
       }
+      // 限制向上拖动的最大距离
       if (this.scrollY < this.minTranslateY || this.scrollY === this.minTranslateY) {
         zIndex = 10
         this.$refs.tab.$el.style.transform = 'translate3d(0,0,0)'
@@ -158,6 +168,7 @@ export default {
         this.$refs.list.scrollTo(0, this.scrollY)
       }, 20)
     },
+    // 图片加载完重新刷新  better-scroll  防止无法拖动
     loadImage () {
       if (!this.checkloaded) {
         this.checkloaded = true
@@ -166,10 +177,19 @@ export default {
     }
   },
   created () {
+    // 设置scroll相关信息
     this.probeType = 3
     this.listenScroll = true
-    this.startScroll = false
+    // 获取歌手ID
     this.id = this.$route.params.id
+    // 设置tab相关信息
+    this.tabs = [
+      {title: '热门演唱'},
+      {title: '专辑'},
+      {title: '视频'},
+      {title: '艺人信息'}
+    ]
+    this.flag = true
   },
   mounted () {
     this.$nextTick(() => {
@@ -269,13 +289,19 @@ export default {
       position: relative
       background white
       height 40px
+    &.list-fade-enter-active, &.list-fade-leave-active
+      transition: opacity 0.3s
+      .list
+        transition: all 0.3s
+    &.list-fade-enter, &.list-fade-leave-to
+      opacity: 0
+      .list
+        transform: translate3d(0, 100%, 0)
+    &.list-fade-enter
     .list
       position: fixed
       top: 0
       bottom: 0
       width: 100%
       margin-top -1px
-    .tab
-      background white
-      z-index 40
  </style>

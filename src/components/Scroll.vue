@@ -1,4 +1,5 @@
 <template>
+  <!-- better-scroll具体封装思路参考 https://www.imooc.com/article/18232 -->
   <div ref="wrapper">
     <slot></slot>
   </div>
@@ -9,30 +10,41 @@ import BScroll from 'better-scroll'
 export default {
   name: 'Scroll',
   props: {
+    /**
+     * 1 滚动的时候会派发scroll事件，会截流。
+     * 2 滚动的时候实时派发scroll事件，不会截流。
+     * 3 除了实时派发scroll事件，在swipe的情况下仍然能实时派发scroll事件
+     */
     probeType: {
       type: Number,
       default: 1
     },
+    /** 点击列表是否派发click事件 */
     click: {
       type: Boolean,
       default: true
     },
+    /** 列表数据 */
     data: {
       type: Array,
       default: null
     },
+    /** 是否派发滚动事件 */
     listenScroll: {
       type: Boolean,
       default: false
     },
+    /**  */
     startScroll: {
       type: Boolean,
       default: true
     },
+    /** 是否派发滚动到底部事件，用于上来加载 */
     pullup: {
       type: Boolean,
       default: false
     },
+    /** 是否派发顶部下拉事件，用于下拉刷新 */
     pulldown: {
       type: Boolean,
       default: false
@@ -40,6 +52,7 @@ export default {
 
   },
   mounted () {
+    // 初始化better-scroll
     this.$nextTick(() => {
       this._initScroll()
     })
@@ -49,10 +62,12 @@ export default {
       if (!this.$refs.wrapper) {
         return
       }
+      // 初始化
       this.scroll = new BScroll(this.$refs.wrapper, {
         probeType: this.probeType,
         click: this.click
       })
+      // 是否派发监听
       if (this.listenScroll) {
         let _this = this
         this.scroll.on('scroll', (pos) => {
@@ -69,9 +84,11 @@ export default {
         })
       }
     },
+    // 代理better-scroll的enable方法   下同
     enable () {
       this.scroll && this.scroll.enable()
     },
+
     disable () {
       this.scroll && this.scroll.disable()
     },
@@ -83,15 +100,11 @@ export default {
     }
   },
   watch: {
+    // 监听数据变化，重新计算，防止better-scroll无法拖动
     data () {
       this.$nextTick(() => {
         this.refresh()
       })
-    },
-    startScroll () {
-      if (this.startScroll === false) {
-        this.disable()
-      }
     }
   }
 }

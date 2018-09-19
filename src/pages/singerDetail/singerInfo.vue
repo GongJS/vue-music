@@ -46,7 +46,7 @@ export default {
   data () {
     return {
       info: '',
-      topicData: [],
+      topicData: [], // 专栏文章数据
       count: 0,
       showLoading: true
     }

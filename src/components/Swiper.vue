@@ -33,6 +33,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  // 修改轮播图的小点点颜色
   .wrapper >>> .swiper-pagination-bullet-active
     background #DF433A
   .wrapper

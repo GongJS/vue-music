@@ -26,8 +26,8 @@ export default {
   },
   data () {
     return {
-      state: '',
-      hasBorder: ''
+      state: '', // 当前的选择状态
+      hasBorder: '' // 滑动的时候是否显示下边框
     }
   },
   methods: {
@@ -44,6 +44,8 @@ export default {
         this.$emit('updateList', params)
       }
     },
+
+    // 监听滚轮
     scroll (pos) {
       console.log(pos)
       if (pos.y < -10) {

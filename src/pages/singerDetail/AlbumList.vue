@@ -36,9 +36,9 @@ export default {
   },
   data () {
     return {
-      showMask: false,
-      albums: [],
-      showLoading: true
+      showMask: false, // 控制遮罩层
+      albums: [], // 专辑数据
+      showLoading: true // 是否显示加载状态
     }
   },
   methods: {
