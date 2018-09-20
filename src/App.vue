@@ -20,8 +20,8 @@ export default {
   created () {
     this.tabs = [
       {title: '推荐', path: '/recommend'},
-      {title: '歌手', path: '/singer'},
-      {title: '电台', path: '/radio'}
+      {title: '朋友', path: '/friends'},
+      {title: '电台', path: '/radios'}
     ]
   }
 }
