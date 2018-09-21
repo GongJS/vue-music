@@ -7,7 +7,7 @@
           <p style="margin-left:7px;">按发行时间排序</p>
         </div>
         <div class="item">
-          <span class="iconfont font">&#xe666;</span>
+          <span class="iconfont font">&#xe603;</span>
         </div>
       </div>
       <div v-for="item in albums" :key="item.id" class="album-list">
@@ -39,6 +39,12 @@ export default {
       showMask: false, // 控制遮罩层
       albums: [], // 专辑数据
       showLoading: true // 是否显示加载状态
+    }
+  },
+  watch: {
+    id () {
+      console.log(this.id)
+      this.requestAlbum(this.id)
     }
   },
   methods: {

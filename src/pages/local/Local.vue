@@ -1,17 +1,20 @@
 <template>
-  <div>
-    <home-header />
+  <div class="local">
+    <br/>
+    <p>敬请期待</p>
   </div>
 </template>
 
 <script>
-import HomeHeader from '@/components/Header'
 export default {
-  name: 'Local',
-  components: {
-    HomeHeader
-  }
+  name: 'Local'
 }
 </script>
 
-<style></style>
+<style lang="stylus" scoped>
+  .local
+    background white
+    min-height 800px
+    text-align center
+    font-size 14px
+</style>

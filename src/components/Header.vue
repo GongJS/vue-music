@@ -8,15 +8,18 @@
         <span
           class="iconfont"
           v-for="(item,index) in iconItems"
-          :key="item.id"
+          :key="index"
           :class="{active: setIndex === index}"
+          :style="{color:active}"
           v-html="item.icon"
-          @click="handleClick($event, index, item.router)"
+          @click="handleClick(index, item.router)"
         >
         </span>
     </div>
     <div class="header-right">
-      <span class="iconfont font">&#xe678;</span>
+      <router-link to="/search" tag="span">
+        <span class="iconfont font">&#xe678;</span>
+      </router-link>
     </div>
   </div>
 </div>
@@ -28,21 +31,19 @@ export default {
   data () {
     return {
       setIndex: 1,
+      active: '',
       iconItems: [
-        {icon: '&#xe680;', router: '/local', id: 0},
-        {icon: '&#xe674;', router: '/recommend', id: 1},
-        {icon: '&#xe678;', router: '/music', id: 2}
+        {icon: '&#xe680;', router: '/local'},
+        {icon: '&#xe674;', router: '/recommend'},
+        {icon: '&#xe6f6;', router: '/music'}
       ]
     }
   },
   methods: {
-    handleClick (e, index, router) {
-      console.log(index)
+    handleClick (index, router) {
       this.setIndex = index
-      this.$nextTick(() => {
-        this.$router.push({
-          path: router
-        })
+      this.$router.push({
+        path: router
       })
     }
   }

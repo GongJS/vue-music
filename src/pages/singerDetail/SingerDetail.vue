@@ -47,7 +47,7 @@
         <div>
           <div class="song-list-wrapper">
             <keep-alive>
-              <song-list v-if="songState" :id="id"  @singerDate="singerDate"></song-list>
+              <song-list v-if="songState" :id="id"></song-list>
               <album-list v-else-if="albumState" :id="id"></album-list>
               <singer-info  v-else-if="singerInfoState" :id="id" :name="name"></singer-info>
               <vedio v-else/>
@@ -66,6 +66,7 @@ import SongList from './SongList'
 import AlbumList from './AlbumList'
 import SingerInfo from './singerInfo'
 import Vedio from './Vedio'
+import {getData} from '@/utils'
 export default {
   name: 'SingerDetail',
   components: {
@@ -79,6 +80,7 @@ export default {
   data () {
     return {
       id: 0, // 歌手id
+      cat: '', // 歌手分类
       bgImage: '', // 背景图地址
       name: '', // 歌手名称
       scrollY: 0, // 滚轮位置
@@ -87,7 +89,8 @@ export default {
       albumState: false,
       singerInfoState: false,
       vedioState: false,
-      showLoading: true
+      showLoading: true,
+      url: 'artists'
     }
   },
   computed: {
@@ -103,7 +106,7 @@ export default {
       let opacity = 1
       let brightness = 1
       const percent = Math.abs(this.scrollY / this.imageHeight)
-      brightness = 1 - percent + 0.2 // 保留一点图片亮度
+      brightness = 1 - percent < 0.2 ? 0.2 : 1 - percent// 保留一点图片亮度
       opacity = 1 - percent
       this.$refs.bgImage.style.filter = `brightness(${brightness})`
       this.$refs.tab.$el.style.transform = `translate3d(0,${translateY}px,0)`
@@ -131,18 +134,11 @@ export default {
     }
   },
   methods: {
-    singerDate (data) {
-      this.showLoading = false
-      this.name = data[0]
-      this.bgImage = data[1]
-    },
     scroll (pos) {
       this.scrollY = pos.y
     },
     back () {
-      this.$router.push({
-        path: '/singer/'
-      })
+      this.$router.go(-1)
     },
     share () {
       console.log('分享')
@@ -174,6 +170,12 @@ export default {
         this.checkloaded = true
         this.$refs.list.refresh()
       }
+    },
+    async request () {
+      const result = await getData(this.url, this.id)
+      this.showLoading = false
+      this.bgImage = result.artist.picUrl
+      this.name = result.artist.name
     }
   },
   created () {
@@ -181,7 +183,8 @@ export default {
     this.probeType = 3
     this.listenScroll = true
     // 获取歌手ID
-    this.id = this.$route.params.id
+    this.id = this.$route.query.id
+    this.cat = this.$route.query.cat
     // 设置tab相关信息
     this.tabs = [
       {title: '热门演唱'},
@@ -190,14 +193,20 @@ export default {
       {title: '艺人信息'}
     ]
     this.flag = true
+    this.request()
   },
   mounted () {
     this.$nextTick(() => {
       this.imageHeight = this.$refs.bgImage.clientHeight
       this.minTranslateY = -this.imageHeight * 0.847
       this.$refs.list.$el.style.top = `${this.imageHeight * 1.152}px`
-      this.$emit('hiddenList') // 通知父组件隐藏歌手列表
     })
+  },
+  activated () {
+    if (this.id !== this.$route.query.id) {
+      this.id = this.$route.query.id
+      this.request()
+    }
   }
 }
 </script>

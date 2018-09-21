@@ -21,13 +21,24 @@
 import Scroll from '@/components/Scroll'
 export default {
   name: 'SingerFilter',
+  props: ['title', 'changeState'],
   components: {
     Scroll
   },
   data () {
     return {
       state: '', // 当前的选择状态
-      hasBorder: '' // 滑动的时候是否显示下边框
+      hasBorder: '', // 滑动的时候是否显示下边框
+      alphabets: ['热门歌手', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+        'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    }
+  },
+  watch: {
+    changeState () {
+      console.log(this.changeState, 999)
+      if (this.state === '热门歌手') {
+        this.alphabets = this.alphabets.slice(0, 1)
+      }
     }
   },
   methods: {
@@ -56,9 +67,11 @@ export default {
     }
   },
   created () {
-    this.alphabets = ['热门歌手', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-      'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     this.listenScroll = true
+    console.log('title', this.title, 'changeState', this.changeState)
+    if (this.changeState === '热门歌手' || this.title === '热门歌手') {
+      this.alphabets = this.alphabets.slice(0, 1)
+    }
   }
 }
 </script>

@@ -1,18 +1,19 @@
 <template>
 <div  @click="cancel">
   <div>
-    <div class="header" :style="{display: isHidden}" >
-      <router-link to="/recommend">
+    <div class="header">
+      <router-link to="/search/singerclassify">
         <span class="iconfont font">&#xe72a;</span>
       </router-link>
-      <span>华语男歌手-{{state ? state.toLocaleUpperCase() : ''}}</span>
+      <span v-if="title === '热门歌手'">热门歌手</span>
+      <span v-else>{{title}}-{{state ? state.toLocaleUpperCase() : ''}}</span>
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
     <div class="masklayer"
       ref="masklayer"
       v-show="isFilter"
     ></div>
-    <div class="singer" :style="{display: isHidden}">
+    <div class="singer">
       <scroll class="singer-content"
         :data="items"
         :listenScroll="listenScroll"
@@ -35,9 +36,8 @@
     </div>
   </div>
   <div v-if="isFilter" class="filter-wrapper" @touchstart="touch">
-     <singer-filter v-on:updateList="updateList" ></singer-filter>
+     <singer-filter v-on:updateList="updateList" :title="title" :changeState="state"></singer-filter>
   </div>
-  <router-view @hiddenList="hiddenList"></router-view>
   <show-loading v-show="showloading" class="loading"/>
 </div>
 </template>
@@ -58,30 +58,22 @@ export default {
       items: [], // 存放歌手数据
       isFilter: false, // 是否显示遮罩层
       concat: true, // 是否拼接数据，用于下拉加载数据
-      state: '热门歌手', // 歌手分类
-      isHidden: 'block', // 是否隐藏歌手列表
+      title: '', // 歌手大分类（header）
+      state: 'a', // 歌手细分类 （header）
+      cat: 0, // 查询歌手分类参数
       offset: 0, // 数据偏移量
       showloading: true // 是否显示加载动画
     }
   },
-  watch: {
-    // 监听路由跳转，隐藏歌手列表
-    '$route' (to, from) {
-      if (to.path !== '/singer/') {
-
-      } else {
-        this.isHidden = 'block'
-      }
-    }
-  },
   methods: {
     // 获取歌手(热门歌手和字母分类歌手封装在一个函数里)
-    async request (offset, params) {
+    async request (offset, cat, initial) {
       let newUrl = ''
-      if (params === undefined) { // 请求热门歌手
-        newUrl = `/top/artists?offset=${offset}&limit=20`
+      let newInitial = initial === undefined ? 'a' : initial
+      if (cat === 0) { // 请求热门歌手
+        newUrl = `/top/artists?&offset=${offset}&limit=20`
       } else {
-        newUrl = `/artist/list?cat=1001&initial=${params}&offset=${this.offset}&limit=20`
+        newUrl = `/artist/list?cat=${cat}&initial=${newInitial}&offset=${offset}&limit=20`
       }
       this.$http.get(newUrl)
         .then(res => {
@@ -106,9 +98,10 @@ export default {
       this.showloading = true
       this.offset = 0
       if (data === '热门歌手') {
-        this.request(this.offse)
+        this.title = data
+        this.request(this.offset, 0)
       } else {
-        this.request(this.offset, data)
+        this.request(this.offset, this.cat, data)
       }
     },
     // 筛选列表开关
@@ -137,26 +130,46 @@ export default {
       if (this.offset < 100) {
         this.concat = true
         this.showloading = true
-        this.request(this.offset)
+        // 判是否是热门歌手
+        if (this.cat === 0) {
+          this.request(this.offset, 0)
+        } else {
+          this.request(this.offset, this.cat)
+        }
       }
     },
     // 根据选中的歌手跳转到相应的页面
     selectSinger (id) {
+      let cat = this.cat
       this.$router.push({
-        path: `/singer/${id}`
+        path: '/search/singerclassify/singer/singerdetail/',
+        query: {id, cat}
       })
-      this.isHidden = 'none'
-    },
-    // 子组件通知父组件隐藏歌手列表
-    hiddenList () {
-      this.isHidden = 'none'
     }
   },
   created () {
-    this.request(this.offset)
+    this.cat = this.$route.query.cat
+    this.title = this.$route.query.title
+    if (this.cat === 0) {
+      this.title = '热门歌手'
+    }
+    this.request(this.offset, this.cat)
     this.listenScroll = true // 派发滚动事件
     this.probeType = 2 // 滚动实时派发scroll事件，不会截流
     this.pullup = true // 派发滚动到底部的事件，用于上拉加载
+  },
+  activated () {
+    this.offset = 0
+    this.concat = false
+    this.title = this.$route.query.title
+    if (this.title !== '热门歌手') {
+      this.state = 'a'
+    }
+    // 判断是否需要重新获取数据
+    if (this.cat !== this.$route.query.cat) {
+      this.cat = this.$route.query.cat
+      this.request(this.offset, this.cat)
+    }
   }
 }
 </script>
@@ -191,7 +204,6 @@ export default {
       width 100%
       top 45px
       bottom 0
-      display none
       .singer-content
         height: 100%
         overflow: hidden

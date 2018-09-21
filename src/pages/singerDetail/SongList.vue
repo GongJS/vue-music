@@ -41,6 +41,11 @@ export default {
   components: {
     ShowLoading
   },
+  watch: {
+    id () {
+      this.requestSinger(this.id)
+    }
+  },
   data () {
     return {
       albumSize: 0,
@@ -65,7 +70,6 @@ export default {
             }
             this.songs = items
             this.showLoading = false
-            this.$emit('singerDate', [this.name, this.bgImage])
           }
         })
     }

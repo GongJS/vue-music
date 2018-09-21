@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Recommend from '@/pages/recommend/Recommend'
-import Singer from '@/pages/singer/Singer'
-import SingerDetail from '@/pages/singerDetail/SingerDetail'
 import Friends from '@/pages/friends/Friends'
 import Radios from '@/pages/radios/Radios'
 import Local from '@/pages/local/Local'
 import Music from '@/pages/music/Music'
+import Search from '@/pages/search/Search'
+import SingerClassify from '@/pages/singerClassify/SingerClassify'
 
 Vue.use(Router)
 
@@ -26,11 +26,19 @@ export default new Router({
     },
     {
       path: '/local',
-      component: Local
+      component: Local,
+      meta: {
+        showHeader: true,
+        showTab: false
+      }
     },
     {
       path: '/music',
-      component: Music
+      component: Music,
+      meta: {
+        showHeader: true,
+        showTab: false
+      }
     },
     {
       path: '/friends',
@@ -49,16 +57,20 @@ export default new Router({
       }
     },
     {
-      path: '/singer',
-      component: Singer,
-      meta: {
-        showHeader: false,
-        showTab: false
-      },
-      children: [{
-        path: '/singer/:id',
-        component: SingerDetail
-      }]
+      path: '/search',
+      component: Search
+    },
+    {
+      path: '/search/singerclassify',
+      component: SingerClassify
+    },
+    {
+      path: '/search/singerclassify/singer',
+      component: (resolve) => { require(['@/pages/singer/Singer'], resolve) }
+    },
+    {
+      path: '/search/singerclassify/singer/singerdetail',
+      component: (resolve) => { require(['@/pages/singerDetail/SingerDetail'], resolve) }
     }
   ]
 })

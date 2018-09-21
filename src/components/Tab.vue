@@ -2,7 +2,7 @@
 <div class="tab" ref="tab">
   <!--这里用代理的方式，而不是为每个li绑定点击函数 -->
   <!--headerTab singerTab,分别对应不同tab样式（首页和歌手页面），这里采用的方式是用不同的样式来覆盖伪类::before -->
-  <ul @click="handleSwitchTab">
+  <ul @click="handleSwitchTab" class="border-bottom">
     <li
       v-for="(tab, index) in tabs"
       :key="index"
@@ -81,7 +81,6 @@ export default {
     align-items center
     position absolute
     width 100%
-    list-style: none
     .headerTab
       position relative
       line-height 40px
