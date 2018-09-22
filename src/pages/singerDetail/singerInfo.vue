@@ -37,6 +37,7 @@
 
 <script>
 import ShowLoading from '@/components/ShowLoading'
+import {getData} from '@/utils'
 export default {
   name: 'SingerInfo',
   props: ['id', 'name'],
@@ -53,30 +54,21 @@ export default {
   },
   methods: {
     // 获取歌手信息
-    async requestSingerInfo (id) {
+    async requestSingerInfo () {
+      const result = await getData('/artist/desc', this.id)
       this.$http.get(`/artist/desc?id=${this.id}`)
-        .then(res => {
-          if (res.status === 200) {
-            let item = []
-            this.info = res.data.briefDesc
-            this.count = res.data.count
-            this.showLoading = false
-            for (let i = 0; i < res.data.topicData.length; i++) {
-              item.push(res.data.topicData[i])
-            }
-            this.topicData = item
-          }
-        })
+      let item = []
+      this.info = result.briefDesc
+      this.count = result.count
+      this.showLoading = false
+      for (let i = 0; i < result.topicData.length; i++) {
+        item.push(result.topicData[i])
+      }
     },
     // 获取相似歌手
-    async requestSingerSimi (id) {
-      this.$http.get(`/simi/artist?id=${this.id}`, {xhrFields: { withCredentials: true }})
-        .then(res => {
-          console.log(res)
-          if (res.status === 200) {
-            // 暂时获取不到
-          }
-        })
+    async requestSingerSimi () {
+      const result = await getData('/simi/artist', this.id)
+      console.log(result) // 暂时获取不到
     },
     formatDate (data) {
       let newDate = (data / 10000).toFixed(1)
@@ -84,8 +76,8 @@ export default {
     }
   },
   created () {
-    this.requestSingerInfo(this.id)
-    this.requestSingerSimi(this.id)
+    this.requestSingerInfo()
+    this.requestSingerSimi()
   }
 }
 </script>

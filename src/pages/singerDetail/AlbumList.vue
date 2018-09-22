@@ -7,7 +7,7 @@
           <p style="margin-left:7px;">按发行时间排序</p>
         </div>
         <div class="item">
-          <span class="iconfont font">&#xe603;</span>
+          <span class="iconfont">&#xe603;</span>
         </div>
       </div>
       <div v-for="item in albums" :key="item.id" class="album-list">
@@ -28,6 +28,7 @@
 
 <script>
 import ShowLoading from '@/components/ShowLoading'
+import {getData} from '@/utils'
 export default {
   name: 'AlbumList',
   props: ['id'],
@@ -43,25 +44,19 @@ export default {
   },
   watch: {
     id () {
-      console.log(this.id)
-      this.requestAlbum(this.id)
+      this.requestAlbum()
     }
   },
   methods: {
     // 获取专辑
-    async requestAlbum (id) {
-      this.$http.get(`/artist/album?id=${id}`)
-        .then(res => {
-          console.log(res)
-          let items = []
-          if (res.status === 200) {
-            for (let i = 0; i < res.data.hotAlbums.length; i++) {
-              items.push(res.data.hotAlbums[i])
-            }
-            this.albums = items
-            this.showLoading = false
-          }
-        })
+    async requestAlbum () {
+      const result = await getData('/artist/album', this.id)
+      let items = []
+      for (let i = 0; i < result.hotAlbums.length; i++) {
+        items.push(result.hotAlbums[i])
+      }
+      this.albums = items
+      this.showLoading = false
     },
     // 时间格式转换
     formatTime (time) {
@@ -70,7 +65,7 @@ export default {
     }
   },
   created () {
-    this.requestAlbum(this.id)
+    this.requestAlbum()
   }
 }
 </script>
@@ -91,7 +86,7 @@ export default {
         justify-content center
         align-items center
         height 50px
-        .font
+        .iconfont
           margin-right 10px
           color #323232
     .album-list

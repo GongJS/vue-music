@@ -21,6 +21,7 @@ import Swiper from '@/components/swiper'
 import Iconfont from './Iconfont'
 import Scroll from '@/components/Scroll'
 import HomeItem from '@/components/HomeItem'
+import {getData} from '@/utils'
 export default {
   name: 'Home',
   components: {
@@ -36,17 +37,13 @@ export default {
   },
   methods: {
     // 获取轮播图
-    async requestBanner (id) {
-      this.$http.get('/banner')
-        .then(res => {
-          let items = []
-          if (res.status === 200) {
-            for (let i = 0; i < res.data.banners.length; i++) {
-              items.push(res.data.banners[i].picUrl)
-            }
-            this.banners = items
-          }
-        })
+    async requestBanner () {
+      const result = await getData('/banner')
+      let items = []
+      for (let i = 0; i < result.banners.length; i++) {
+        items.push(result.banners[i].picUrl)
+      }
+      this.banners = items
     }
   },
   created () {

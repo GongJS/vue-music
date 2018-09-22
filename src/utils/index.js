@@ -4,7 +4,7 @@ export function getData (url, id) {
     if (id) {
       url = url + `?id=${id}`
     }
-    axios.get(url)
+    axios.get(url, {xhrFields: { withCredentials: true }})
       .then(res => {
         if (res.status === 200) {
           resolve(res.data)

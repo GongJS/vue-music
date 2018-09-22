@@ -35,7 +35,6 @@ export default {
   },
   watch: {
     changeState () {
-      console.log(this.changeState, 999)
       if (this.state === '热门歌手') {
         this.alphabets = this.alphabets.slice(0, 1)
       }
@@ -58,7 +57,6 @@ export default {
 
     // 监听滚轮
     scroll (pos) {
-      console.log(pos)
       if (pos.y < -10) {
         this.hasBorder = '1px solid #f9f5f5'
       } else {
@@ -68,7 +66,6 @@ export default {
   },
   created () {
     this.listenScroll = true
-    console.log('title', this.title, 'changeState', this.changeState)
     if (this.changeState === '热门歌手' || this.title === '热门歌手') {
       this.alphabets = this.alphabets.slice(0, 1)
     }

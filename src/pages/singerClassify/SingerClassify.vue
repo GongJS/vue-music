@@ -2,7 +2,7 @@
   <div class="classify">
     <div class="header">
       <router-link to="/search" class="back">
-        <span class="iconfont font">&#xe72a;</span>
+        <span class="iconfont">&#xe72a;</span>
       </router-link>
       <div class="title">歌手分类</div>
     </div>

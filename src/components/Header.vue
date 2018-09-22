@@ -1,8 +1,8 @@
 <template>
 <div>
   <div class="header">
-    <div class="header-left">
-       <span class="iconfont font">&#xeed4;</span>
+    <div class="header-left" @click="showSlideLogin">
+       <span class="iconfont">&#xeed4;</span>
     </div>
     <div class="header-center">
         <span
@@ -18,7 +18,7 @@
     </div>
     <div class="header-right">
       <router-link to="/search" tag="span">
-        <span class="iconfont font">&#xe678;</span>
+        <span class="iconfont">&#xe678;</span>
       </router-link>
     </div>
   </div>
@@ -45,6 +45,9 @@ export default {
       this.$router.push({
         path: router
       })
+    },
+    showSlideLogin () {
+      this.$emit('showSlideLogin')
     }
   }
 }
@@ -65,7 +68,7 @@ export default {
         align-items center
         color white
         width 50px
-        .font
+        .iconfont
           font-size 18px
           font-weight bold
       .header-center
@@ -83,7 +86,7 @@ export default {
         align-items center
         color white
         width 50px
-        .font
+        .iconfont
           font-size 18px
           font-weight bold
 </style>

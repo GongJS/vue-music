@@ -2,26 +2,26 @@
     <div class="singer-detail" >
       <div class="header" @click="back">
          <div class="back">
-          <span class="iconfont font">&#xe72a;</span>
+          <span class="iconfont">&#xe72a;</span>
           <span class="title">{{name}}</span>
         </div>
         <div class="share">
           <div class="hidden" v-show="isHidden === 'none'">
-            <span class="iconfont font">&#xe632;</span>
+            <span class="iconfont">&#xe632;</span>
             <span style="font-size:0.25rem;">收藏</span>
           </div>
           <div>
-            <span class="iconfont font" @click.stop="share">&#xe643;</span>
+            <span class="iconfont" @click.stop="share">&#xe643;</span>
           </div>
         </div>
       </div>
       <div class="homepage" ref="homepage" :style="{display: isHidden}">
         <p class="collect">
-          <span class="iconfont font">&#xe632;</span>
+          <span class="iconfont">&#xe632;</span>
           <span>收藏</span>
         </p>
         <p class="page">
-          <span class="iconfont font">&#xe607;</span>
+          <span class="iconfont">&#xe607;</span>
           <span class="user">个人主页</span>
         </p>
       </div>
@@ -233,7 +233,7 @@ export default {
       .back
         display flex
         justify-content space-around
-        .font
+        .iconfont
           font-size  20px
           margin-right 10px
       .share
@@ -251,7 +251,7 @@ export default {
           font-size 16px
           margin-right 15px
           padding 0 5px
-        .font
+        .iconfont
           font-size  20px
           margin-right 10px
     .homepage
@@ -275,7 +275,7 @@ export default {
         width 80px
         height 25px
         border-radius 0.5rem 0.5rem 0.5rem 0.5rem
-        .font
+        .iconfont
           font-size 20px
       .page
         display flex
@@ -285,7 +285,7 @@ export default {
         height 25px
         border-radius 0.5rem 0.5rem 0.5rem 0.5rem
         border 1px solid white
-        .font
+        .iconfont
           font-size 20px
     .bg-image
       position relative

@@ -7,6 +7,7 @@ import Local from '@/pages/local/Local'
 import Music from '@/pages/music/Music'
 import Search from '@/pages/search/Search'
 import SingerClassify from '@/pages/singerClassify/SingerClassify'
+import Login from '@/pages/login/Login'
 
 Vue.use(Router)
 
@@ -23,6 +24,10 @@ export default new Router({
         showHeader: true,
         showTab: true
       }
+    },
+    {
+      path: '/login',
+      component: Login
     },
     {
       path: '/local',

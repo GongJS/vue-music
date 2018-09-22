@@ -6,6 +6,7 @@ import router from './router'
 import fastClick from 'fastclick'
 import axios from 'axios'
 import VueLazyload from 'vue-lazyload'
+import store from './store'
 import 'lib-flexible'
 import 'styles/reset.css'
 import 'styles/border.css'
@@ -21,6 +22,7 @@ Vue.use(VueLazyload)
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

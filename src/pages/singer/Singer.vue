@@ -3,7 +3,7 @@
   <div>
     <div class="header">
       <router-link to="/search/singerclassify">
-        <span class="iconfont font">&#xe72a;</span>
+        <span class="iconfont">&#xe72a;</span>
       </router-link>
       <span v-if="title === '热门歌手'">热门歌手</span>
       <span v-else>{{title}}-{{state ? state.toLocaleUpperCase() : ''}}</span>
@@ -27,7 +27,7 @@
             <img v-lazy="item.img1v1Url">
             <span>{{item.name}}</span>
             <div v-if="item.accountId" class="item-right">
-              <span class="iconfont font">&#xe7ad;</span>
+              <span class="iconfont">&#xe7ad;</span>
               <span>已入驻</span>
             </div>
           </div>
@@ -46,6 +46,7 @@
 import Scroll from '@/components/Scroll'
 import SingerFilter from './SingerFilter'
 import ShowLoading from '@/components/ShowLoading'
+import {getData} from '@/utils'
 export default {
   name: 'Singer',
   components: {
@@ -75,20 +76,16 @@ export default {
       } else {
         newUrl = `/artist/list?cat=${cat}&initial=${newInitial}&offset=${offset}&limit=20`
       }
-      this.$http.get(newUrl)
-        .then(res => {
-          let newItems = []
-          if (res.status === 200) {
-            for (let i = 0; i < res.data.artists.length; i++) {
-              newItems.push(res.data.artists[i])
-            }
-            this.showloading = false
-            if (this.concat === false) {
-              this.items = []
-            }
-            this.items = this.items.concat(newItems)
-          }
-        })
+      const result = await getData(newUrl)
+      let newItems = []
+      for (let i = 0; i < result.artists.length; i++) {
+        newItems.push(result.artists[i])
+      }
+      this.showloading = false
+      if (this.concat === false) {
+        this.items = []
+      }
+      this.items = this.items.concat(newItems)
     },
     // 根据筛选列表的选项更新数据
     updateList (data) {
@@ -180,7 +177,7 @@ export default {
       background #DF433A
       width 100%
       line-height 45px
-      .font
+      .iconfont
         font-size 18px
       .filter
         position absolute
@@ -225,7 +222,7 @@ export default {
             align-items center
             position absolute
             right 5px
-            .font
+            .iconfont
               color #DF433A
               font-size 18px
             span:nth-child(2)

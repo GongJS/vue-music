@@ -4,11 +4,11 @@
    <div v-else>
       <div class="wrapper border-bottom">
         <div class="item">
-          <span class="iconfont font">&#xe62d;</span>
+          <span class="iconfont">&#xe62d;</span>
           <p style="margin-left:7px;">收藏热门50单曲</p>
         </div>
         <div class="item">
-          <span class="iconfont font">&#xe666;</span>
+          <span class="iconfont">&#xe666;</span>
           <p style="margin-left:2px;color:red;">多选</p>
         </div>
       </div>
@@ -25,8 +25,8 @@
           </div>
         </div>
         <div class="play">
-          <span class="iconfont font">&#xe6f6;</span>
-          <span class="iconfont font">&#xe6b2;</span>
+          <span class="iconfont">&#xe6f6;</span>
+          <span class="iconfont">&#xe6b2;</span>
         </div>
       </div>
    </div>
@@ -35,6 +35,7 @@
 
 <script>
 import ShowLoading from '@/components/ShowLoading'
+import {getData} from '@/utils'
 export default {
   name: 'SongList',
   props: ['id'],
@@ -43,39 +44,31 @@ export default {
   },
   watch: {
     id () {
-      this.requestSinger(this.id)
+      this.requestSinger()
     }
   },
   data () {
     return {
       albumSize: 0,
-      bgImage: '',
-      name: '',
       songs: [],
       showLoading: true
     }
   },
   methods: {
-    // 获取歌手信息/热门歌曲
-    async requestSinger (id) {
-      this.$http.get(`/artists?id=${id}`)
-        .then(res => {
-          let items = []
-          if (res.status === 200) {
-            this.albumSize = res.data.artist.albumSize
-            this.bgImage = res.data.artist.picUrl
-            this.name = res.data.artist.name
-            for (let i = 0; i < res.data.hotSongs.length; i++) {
-              items.push(res.data.hotSongs[i])
-            }
-            this.songs = items
-            this.showLoading = false
-          }
-        })
+    // 获取热门歌曲
+    async requestSinger () {
+      const result = await getData('/artists', this.id)
+      let items = []
+      this.albumSize = result.artist.albumSize
+      for (let i = 0; i < result.hotSongs.length; i++) {
+        items.push(result.hotSongs[i])
+      }
+      this.songs = items
+      this.showLoading = false
     }
   },
   created () {
-    this.requestSinger(this.id)
+    this.requestSinger()
   }
 }
 </script>
@@ -95,7 +88,7 @@ export default {
         display flex
         justify-content center
         align-items center
-       .font
+       .iconfont
           margin-left 5px
           font-size 20px
           color red
@@ -161,6 +154,6 @@ export default {
         height 45px
         width 50px
         color #B0B0B0
-        .font
+        .iconfont
           font-size 14px
 </style>

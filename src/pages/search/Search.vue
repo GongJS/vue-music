@@ -2,7 +2,7 @@
   <div class="search">
     <div class="header">
       <div class="back" @click="back">
-        <span class="iconfont font">&#xe72a;</span>
+        <span class="iconfont">&#xe72a;</span>
       </div>
       <div class="input">
         <input v-model="inputData" />
@@ -12,7 +12,7 @@
     <router-link tag="div" class="classify border-bottom" to="/search/singerclassify">
       <span class="iconfont fontSize">&#xe607;</span>
       <span>歌手分类</span>
-      <span class="iconfont font">&#xe624;</span>
+      <span class="iconfont">&#xe624;</span>
     </router-link>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
       if (this.inputData !== '') {
         this.showDelete = true
       } else {
-        this.showDelete = ''
+        this.showDelete = false
       }
     }
   },
@@ -106,6 +106,6 @@ export default {
     .fontSize
       font-size 16px
       font-weight bold
-    .font
+    .iconfont
       font-size 12px
 </style>
