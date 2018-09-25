@@ -1,7 +1,9 @@
 <template>
 <div class="info">
+  <!--加载动画-->
   <show-loading v-if="showLoading"/>
   <div v-else>
+    <!--歌手相关信息-->
     <div>
       <br>
       <p class="title">{{name}}简介</p>
@@ -11,6 +13,7 @@
         <p class="spread">完整歌手介绍 ></p>
       </div>
     </div>
+    <!--专栏文章-->
     <div>
       <p class="column">相关专栏文章</p>
       <div v-for="item in topicData" :key="item.id" class="wrapper">
@@ -25,6 +28,7 @@
       <br>
       <p class="count">全部专栏文章({{count}}) ></p>
     </div>
+    <!--相似歌手-->
     <div>
       <br>
       <p class="title">相似歌手</p>

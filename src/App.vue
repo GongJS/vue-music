@@ -11,7 +11,7 @@
       @click="handleClick"
       @touchstart="handleTouch"
     ></div>
-    <keep-alive>
+    <keep-alive exclude="Search">
       <router-view/>
     </keep-alive>
   </div>

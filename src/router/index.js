@@ -5,7 +5,6 @@ import Friends from '@/pages/friends/Friends'
 import Radios from '@/pages/radios/Radios'
 import Local from '@/pages/local/Local'
 import Music from '@/pages/music/Music'
-import Search from '@/pages/search/Search'
 import SingerClassify from '@/pages/singerClassify/SingerClassify'
 import Login from '@/pages/login/Login'
 
@@ -63,7 +62,13 @@ export default new Router({
     },
     {
       path: '/search',
-      component: Search
+      component: (resolve) => { require(['@/pages/search/Search'], resolve) },
+      children: [
+        {
+          path: '/search/singer',
+          component: (resolve) => { require(['@/pages/searchSinger/SearchSinger'], resolve) }
+        }
+      ]
     },
     {
       path: '/search/singerclassify',

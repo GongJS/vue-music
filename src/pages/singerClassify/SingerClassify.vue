@@ -8,6 +8,7 @@
     </div>
     <div class="scroll"  @click="handleClick">
       <scroll class="scroll-content" :data="singerClassifys">
+        <!--列表嵌套循环 -->
         <div v-for="(items,index) in singerClassifys" :key="index" class="items">
           <div v-for="(item, index) in items" :key="index" class="item" :data-cat="item.cat" :data-title="item.title">
             {{item.title}}
@@ -16,7 +17,6 @@
       </scroll>
     </div>
   </div>
-
 </template>
 
 <script>

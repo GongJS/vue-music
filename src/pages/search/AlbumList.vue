@@ -3,15 +3,6 @@
     <!--加载动画-->
     <show-loading v-if="showLoading"/>
     <div v-else>
-      <!--标题栏-->
-      <div class="header border-bottom">
-        <div class="item">
-          <p style="margin-left:7px;">按发行时间排序</p>
-        </div>
-        <div class="item">
-          <span class="iconfont">&#xe603;</span>
-        </div>
-      </div>
       <!--专辑列表信息-->
       <div v-for="item in albums" :key="item.id" class="album-list">
         <div v-show="showMask" class="mask"></div>
@@ -34,31 +25,34 @@ import ShowLoading from '@/components/ShowLoading'
 import {getData} from '@/utils'
 export default {
   name: 'AlbumList',
-  props: ['id'],
+  props: ['inputData', 'showLoading', 'inputState'],
   components: {
     ShowLoading
   },
   data () {
     return {
       showMask: true, // 控制遮罩层
-      albums: [], // 专辑数据
-      showLoading: true // 是否显示加载状态
+      albums: [] // 专辑数据
     }
   },
   watch: {
-    id () {
+    inputState () {
+      // 数据输入完才发起请求
       this.requestAlbum()
     }
   },
   methods: {
     // 获取专辑
     async requestAlbum () {
-      const result = await getData('/artist/album', this.id)
+      console.log(this.inputData)
+      const result = await getData(`/search?keywords=${this.inputData}&type=10`)
       let items = []
-      for (let i = 0; i < result.hotAlbums.length; i++) {
-        items.push(result.hotAlbums[i])
+      if (result.code === 200) {
+        for (let i = 0; i < result.result.albums.length; i++) {
+          items.push(result.result.albums[i])
+        }
+        this.albums = items
       }
-      this.albums = items
       this.showLoading = false
     },
     // 时间格式转换
@@ -76,22 +70,6 @@ export default {
   .albums
     background white
     min-height 800px
-    .header
-      display flex
-      justify-content space-between
-      align-content center
-      box-sizing border-box
-      height 45px
-      width 100%
-      color #838383
-      .item
-        display flex
-        justify-content center
-        align-items center
-        height 50px
-        .iconfont
-          margin-right 10px
-          color #323232
     .album-list
       position relative
       display flex

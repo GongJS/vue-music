@@ -1,5 +1,6 @@
 <template>
     <div class="singer-detail" >
+      <!--header -->
       <div class="header" @click="back">
          <div class="back">
           <span class="iconfont">&#xe72a;</span>
@@ -15,6 +16,7 @@
           </div>
         </div>
       </div>
+      <!--收藏  个人主页-->
       <div class="homepage" ref="homepage" :style="{display: isHidden}">
         <p class="collect">
           <span class="iconfont">&#xe632;</span>
@@ -25,8 +27,10 @@
           <span class="user">个人主页</span>
         </p>
       </div>
+      <!--背景图 -->
       <div class="bg-image" :style="bgStyle" @load="loadImage" ref="bgImage">
       </div>
+      <!--tab -->
       <singer-tab
         ref="tab"
         class="tab"
@@ -36,6 +40,7 @@
       >
       </singer-tab>
       <transition name="list-fade">
+      <!--歌手信息  演唱 专辑 视频 艺人信息 -->
       <scroll
         :data="[bgImage]"
         :listen-scroll="listenScroll"
@@ -47,7 +52,13 @@
         <div>
           <div class="song-list-wrapper">
             <keep-alive>
-              <song-list v-if="songState" :id="id"></song-list>
+              <song-list
+                v-if="songState"
+                :id="id"
+                :name="name"
+                :songs="songs"
+                :showLoading="showLoading"
+              ></song-list>
               <album-list v-else-if="albumState" :id="id"></album-list>
               <singer-info  v-else-if="singerInfoState" :id="id" :name="name"></singer-info>
               <vedio v-else/>
@@ -85,6 +96,8 @@ export default {
       name: '', // 歌手名称
       scrollY: 0, // 滚轮位置
       isHidden: '', // 控制“收藏” “个人主页” 显示
+      songs: [], // 传给子组件的热门歌曲数据
+      albumSize: [], // 传给子组件的专辑数据
       songState: true, // tab切换状态  热门演唱  专辑  视频  个人信息
       albumState: false,
       singerInfoState: false,
@@ -171,11 +184,20 @@ export default {
         this.$refs.list.refresh()
       }
     },
+    // 请求热门演唱歌曲  歌手名称 背景图地址
     async request () {
       const result = await getData(this.url, this.id)
       this.showLoading = false
-      this.bgImage = result.artist.picUrl
-      this.name = result.artist.name
+      if (result.code === 200) {
+        this.bgImage = result.artist.picUrl
+        this.name = result.artist.name
+        this.albumSize = result.artist.albumSize
+        let items = []
+        for (let i = 0; i < result.hotSongs.length; i++) {
+          items.push(result.hotSongs[i])
+        }
+        this.songs = items
+      }
     }
   },
   created () {
@@ -205,6 +227,7 @@ export default {
   activated () {
     if (this.id !== this.$route.query.id) {
       this.id = this.$route.query.id
+      this.showLoading = true
       this.request()
     }
   }
@@ -295,22 +318,23 @@ export default {
       transform-origin top
       background-size: cover
     .tab
-      position: relative
+      position relative
       background white
       height 40px
     &.list-fade-enter-active, &.list-fade-leave-active
-      transition: opacity 0.3s
+      transition opacity 0.3s
       .list
-        transition: all 0.3s
+        transition all 0.3s
     &.list-fade-enter, &.list-fade-leave-to
-      opacity: 0
+      opacity 0
       .list
-        transform: translate3d(0, 100%, 0)
+        transform translate3d(0, 100%, 0)
     &.list-fade-enter
     .list
-      position: fixed
-      top: 0
-      bottom: 0
-      width: 100%
+      position fixed
+      top 0
+      bottom 0
+      width 100%
       margin-top -1px
+
  </style>

@@ -1,6 +1,7 @@
 <template>
 <div  @click="cancel">
   <div>
+    <!--header -->
     <div class="header">
       <router-link to="/search/singerclassify">
         <span class="iconfont">&#xe72a;</span>
@@ -9,10 +10,12 @@
       <span v-else>{{title}}-{{state ? state.toLocaleUpperCase() : ''}}</span>
       <span class="filter" @click.stop="filter">筛选</span>
     </div>
+    <!--遮罩层 -->
     <div class="masklayer"
       ref="masklayer"
       v-show="isFilter"
     ></div>
+    <!--歌手列表信息 -->
     <div class="singer">
       <scroll class="singer-content"
         :data="items"
@@ -35,9 +38,11 @@
       </scroll>
     </div>
   </div>
+  <!--歌手筛选列表 A B C 。。。。-->
   <div v-if="isFilter" class="filter-wrapper" @touchstart="touch">
      <singer-filter v-on:updateList="updateList" :title="title" :changeState="state"></singer-filter>
   </div>
+  <!--加载动画 -->
   <show-loading v-show="showloading" class="loading"/>
 </div>
 </template>
