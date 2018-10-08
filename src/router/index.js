@@ -62,13 +62,7 @@ export default new Router({
     },
     {
       path: '/search',
-      component: (resolve) => { require(['@/pages/search/Search'], resolve) },
-      children: [
-        {
-          path: '/search/singer',
-          component: (resolve) => { require(['@/pages/searchSinger/SearchSinger'], resolve) }
-        }
-      ]
+      component: (resolve) => { require(['@/pages/search/Search'], resolve) }
     },
     {
       path: '/search/singerclassify',

@@ -1,73 +1,78 @@
 <template>
-    <div class="singer-detail" >
-      <!--header -->
-      <div class="header" @click="back">
-         <div class="back">
-          <span class="iconfont">&#xe72a;</span>
-          <span class="title">{{name}}</span>
-        </div>
-        <div class="share">
-          <div class="hidden" v-show="isHidden === 'none'">
-            <span class="iconfont">&#xe632;</span>
-            <span style="font-size:0.25rem;">收藏</span>
-          </div>
-          <div>
-            <span class="iconfont" @click.stop="share">&#xe643;</span>
-          </div>
-        </div>
+  <div class="singer-detail">
+    <!--header -->
+    <div class="header"
+         @click="back">
+      <div class="back">
+        <span class="iconfont">&#xe72a;</span>
+        <span class="title">{{name}}</span>
       </div>
-      <!--收藏  个人主页-->
-      <div class="homepage" ref="homepage" :style="{display: isHidden}">
-        <p class="collect">
+      <div class="share">
+        <div class="hidden"
+             v-show="isHidden === 'none'">
           <span class="iconfont">&#xe632;</span>
-          <span>收藏</span>
-        </p>
-        <p class="page">
-          <span class="iconfont">&#xe607;</span>
-          <span class="user">个人主页</span>
-        </p>
+          <span style="font-size:0.25rem;">收藏</span>
+        </div>
+        <div>
+          <span class="iconfont"
+                @click.stop="share">&#xe643;</span>
+        </div>
       </div>
-      <!--背景图 -->
-      <div class="bg-image" :style="bgStyle" @load="loadImage" ref="bgImage">
-      </div>
-      <!--tab -->
-      <singer-tab
-        ref="tab"
-        class="tab"
-        :tabs="tabs"
-        :flag="flag"
-        @switchTab="switchTab"
-      >
-      </singer-tab>
-      <transition name="list-fade">
+    </div>
+    <!--收藏  个人主页-->
+    <div class="homepage"
+         ref="homepage"
+         :style="{display: isHidden}">
+      <p class="collect">
+        <span class="iconfont">&#xe632;</span>
+        <span>收藏</span>
+      </p>
+      <p class="page">
+        <span class="iconfont">&#xe607;</span>
+        <span class="user">个人主页</span>
+      </p>
+    </div>
+    <!--背景图 -->
+    <div class="bg-image"
+         :style="bgStyle"
+         @load="loadImage"
+         ref="bgImage">
+    </div>
+    <!--tab -->
+    <singer-tab ref="tab"
+                class="tab"
+                :tabs="tabs"
+                :flag="flag"
+                @switchTab="switchTab">
+    </singer-tab>
+    <transition name="list-fade">
       <!--歌手信息  演唱 专辑 视频 艺人信息 -->
-      <scroll
-        :data="[bgImage]"
-        :listen-scroll="listenScroll"
-        :probe-type="probeType"
-        @scroll="scroll"
-        class="list"
-        ref="list"
-      >
+      <scroll :data="[bgImage]"
+              :listen-scroll="listenScroll"
+              :probe-type="probeType"
+              @scroll="scroll"
+              class="list"
+              ref="list">
         <div>
           <div class="song-list-wrapper">
             <keep-alive>
-              <song-list
-                v-if="songState"
-                :id="id"
-                :name="name"
-                :songs="songs"
-                :showLoading="showLoading"
-              ></song-list>
-              <album-list v-else-if="albumState" :id="id"></album-list>
-              <singer-info  v-else-if="singerInfoState" :id="id" :name="name"></singer-info>
-              <vedio v-else/>
+              <song-list v-if="songState"
+                         :name="name"
+                         :songs="songs"
+                         :showLoading="showLoading"
+                         @select="selectItem"></song-list>
+              <album-list v-else-if="albumState"
+                          :id="id"></album-list>
+              <singer-info v-else-if="singerInfoState"
+                           :id="id"
+                           :name="name"></singer-info>
+              <vedio v-else />
             </keep-alive>
           </div>
         </div>
       </scroll>
-      </transition>
-    </div>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -77,7 +82,8 @@ import SongList from './SongList'
 import AlbumList from './AlbumList'
 import SingerInfo from './singerInfo'
 import Vedio from './Vedio'
-import {getData} from '@/utils'
+import { getData } from '@/utils'
+import { mapActions } from 'vuex'
 export default {
   name: 'SingerDetail',
   components: {
@@ -147,15 +153,30 @@ export default {
     }
   },
   methods: {
+    // 获取滚轮位置
     scroll (pos) {
       this.scrollY = pos.y
     },
+    // 页面后退
     back () {
       this.$router.go(-1)
     },
+    // 分享
     share () {
       console.log('分享')
     },
+    // 选择播放歌曲
+    selectItem (backImage, index) {
+      this.songs[index].backImage = backImage
+      this.songs[index].singer = this.name
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
+    },
+    ...mapActions([
+      'selectPlay'
+    ]),
     switchTab (data) {
       this.songState = false
       this.albumState = false
@@ -209,10 +230,10 @@ export default {
     this.cat = this.$route.query.cat
     // 设置tab相关信息
     this.tabs = [
-      {title: '热门演唱'},
-      {title: '专辑'},
-      {title: '视频'},
-      {title: '艺人信息'}
+      { title: '热门演唱' },
+      { title: '专辑' },
+      { title: '视频' },
+      { title: '艺人信息' }
     ]
     this.flag = true
     this.request()
@@ -235,106 +256,104 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .singer-detail
-    position fixed
-    z-index 100
+.singer-detail
+  position fixed
+  z-index 100
+  top 0
+  left 0
+  right 0
+  bottom 0
+  .header
+    position absolute
+    display flex
+    justify-content space-between
     top 0
-    left 0
-    right 0
-    bottom 0
-    .header
-      position absolute
+    left 10px
+    right 6px
+    z-index 50
+    color white
+    line-height 40px
+    font-size 16px
+    .back
       display flex
-      justify-content space-between
-      top: 0
-      left: 10px
-      right: 6px
-      z-index: 50
-      color white
-      line-height 40px
-      font-size 16px
-      .back
-        display flex
-        justify-content space-around
-        .iconfont
-          font-size  20px
-          margin-right 10px
-      .share
-        display flex
-        justify-content space-around
-        align-items center
-        .hidden
-          display flex
-          justify-content space-around
-          align-items center
-          background #E14537
-          height 25px
-          width 50px
-          border-radius 0.5rem 0.5rem 0.5rem 0.5rem
-          font-size 16px
-          margin-right 15px
-          padding 0 5px
-        .iconfont
-          font-size  20px
-          margin-right 10px
-    .homepage
-      position absolute
-      z-index 50
+      justify-content space-around
+      .iconfont
+        font-size 20px
+        margin-right 10px
+    .share
       display flex
       justify-content space-around
       align-items center
-      height 40px
-      top 32%
-      left 20%
-      right 20%
-      margin 0 auto
-      background transparent
-      color white
-      .collect
+      .hidden
+        display flex
+        justify-content space-around
+        align-items center
         background #E14537
-        display flex
-        justify-content space-around
-        align-items center
-        width 80px
         height 25px
+        width 50px
         border-radius 0.5rem 0.5rem 0.5rem 0.5rem
-        .iconfont
-          font-size 20px
-      .page
-        display flex
-        justify-content space-around
-        align-items center
-        width 80px
-        height 25px
-        border-radius 0.5rem 0.5rem 0.5rem 0.5rem
-        border 1px solid white
-        .iconfont
-          font-size 20px
-    .bg-image
-      position relative
-      width 100%
-      height 0
-      padding-top 70%
-      transform-origin top
-      background-size: cover
-    .tab
-      position relative
-      background white
-      height 40px
-    &.list-fade-enter-active, &.list-fade-leave-active
-      transition opacity 0.3s
-      .list
-        transition all 0.3s
-    &.list-fade-enter, &.list-fade-leave-to
-      opacity 0
-      .list
-        transform translate3d(0, 100%, 0)
-    &.list-fade-enter
+        font-size 16px
+        margin-right 15px
+        padding 0 5px
+      .iconfont
+        font-size 20px
+        margin-right 10px
+  .homepage
+    position absolute
+    z-index 50
+    display flex
+    justify-content space-around
+    align-items center
+    height 40px
+    top 32%
+    left 20%
+    right 20%
+    margin 0 auto
+    background transparent
+    color white
+    .collect
+      background #E14537
+      display flex
+      justify-content space-around
+      align-items center
+      width 80px
+      height 25px
+      border-radius 0.5rem 0.5rem 0.5rem 0.5rem
+      .iconfont
+        font-size 20px
+    .page
+      display flex
+      justify-content space-around
+      align-items center
+      width 80px
+      height 25px
+      border-radius 0.5rem 0.5rem 0.5rem 0.5rem
+      border 1px solid white
+      .iconfont
+        font-size 20px
+  .bg-image
+    position relative
+    width 100%
+    height 0
+    padding-top 70%
+    transform-origin top
+    background-size cover
+  .tab
+    position relative
+    background white
+    height 40px
+  &.list-fade-enter-active, &.list-fade-leave-active
+    transition opacity 0.3s
     .list
-      position fixed
-      top 0
-      bottom 0
-      width 100%
-      margin-top -1px
-
- </style>
+      transition all 0.3s
+  &.list-fade-enter, &.list-fade-leave-to
+    opacity 0
+    .list
+      transform translate3d(0, 100%, 0)
+  &.list-fade-enter, .list
+    position fixed
+    top 0
+    bottom 0
+    width 100%
+    margin-top -1px
+</style>

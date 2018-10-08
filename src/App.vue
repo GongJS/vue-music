@@ -1,7 +1,10 @@
 <template>
   <div id="app">
+    <!--header -->
     <home-header v-show="this.$route.meta.showHeader" @showSlideLogin="showSlideLogin"/>
+    <!--tab -->
     <home-tab v-show="this.$route.meta.showTab" :tabs="tabs"/>
+    <!--左滑登录 -->
     <div class="login" v-show="hidden">
       <slideLogin @confirmLogin="confirmLogin"></slideLogin>
     </div>
@@ -11,9 +14,12 @@
       @click="handleClick"
       @touchstart="handleTouch"
     ></div>
+    <!--二级页面 -->
     <keep-alive exclude="Search">
       <router-view/>
     </keep-alive>
+    <!--播放器 -->
+    <player></player>
   </div>
 </template>
 
@@ -21,12 +27,14 @@
 import HomeHeader from '@/components/Header'
 import HomeTab from '@/components/Tab'
 import SlideLogin from '@/pages/slideLogin/SlideLogin'
+import Player from '@/components/Player'
 export default {
   name: 'App',
   components: {
     HomeHeader,
     HomeTab,
-    SlideLogin
+    SlideLogin,
+    Player
   },
   data () {
     return {
