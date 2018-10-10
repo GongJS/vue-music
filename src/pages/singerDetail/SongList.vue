@@ -22,7 +22,7 @@
              @click="selectItem(item, index)">
           <div class="index">{{index + 1}}</div>
           <div class="info">
-            <div class="name">{{item.al.name}}</div>
+            <div class="name">{{item.name}}</div>
             <div class="singer">
               <span v-if="item.eq"
                     class="sq">SQ</span>

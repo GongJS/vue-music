@@ -72,9 +72,12 @@
         <p>横滑可以切换上下首哦</p>
       </div>
       <div class="icon">
-        <span class="iconfont"
-              @click.stop="togglePlaying"
-              v-html="miniIcon"></span>
+        <progress-circle :radius="radius"
+                         :percent="percent">
+          <span class="iconfont control-icon"
+                @click.stop="togglePlaying"
+                v-html="miniIcon"></span>
+        </progress-circle>
         <span class="iconfont">&#xe802;</span>
       </div>
     </div>
@@ -91,16 +94,19 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { getSongDate } from '@/utils'
 import ProgressBar from '@/components/ProgressBar'
+import ProgressCircle from '@/components/ProgressCircle'
 export default {
   name: 'Player',
   components: {
-    ProgressBar
+    ProgressBar,
+    ProgressCircle
   },
   data () {
     return {
       songReady: false,
       currentTime: 0,
-      totalDurationTime: 0
+      totalDurationTime: 0,
+      radius: 45
     }
   },
   computed: {
@@ -111,7 +117,7 @@ export default {
       return this.playing ? 'play' : 'play pause'
     },
     miniIcon () {
-      return this.playing ? '&#xe769;' : '&#xe696;'
+      return this.playing ? '&#xe7af;' : '&#xe696;'
     },
     percent () {
       return this.currentTime / this.totalDurationTime
@@ -384,9 +390,17 @@ export default {
         padding 5px
     .icon
       width calc(30% - 45px)
+      display flex
+      align-content center
+      justify-content space-around
       .iconfont
         font-size 0.6rem
         margin-right 5px
+        font-weight lighter
+      .control-icon
+        position absolute
+        top 0
+        left 0
   @keyframes rotate
     0%
       transform rotate(0)
