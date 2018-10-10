@@ -24,14 +24,15 @@
              height="100%"
              :src="currentSong.backImage">
       </div>
-      <!--圆形碟片图 -->
-      <div class="disc">
+      <!--圆形碟片 CD-->
+      <div class="disc"
+           :class="cdCls">
         <div class="song-img"
              :style="`background-image:url(${currentSong.backImage})`"
              ref="rotate">
         </div>
       </div>
-      <!--底部播放器 -->
+      <!--normal 播放器 -->
       <div class="footer">
         <div class="top">
           <span class="iconfont">&#xe613;</span>
@@ -39,42 +40,213 @@
           <span class="iconfont">&#xe748;</span>
           <span class="iconfont">&#xe6b2;</span>
         </div>
-        <div class="range"></div>
+        <div class="progress-wrapper">
+          <span class="time time-l">{{format(currentTime)}}</span>
+          <div class="progress-bar-wrapper">
+            <progress-bar :percent="percent"
+                          @percentChange="onProgressBarChange"></progress-bar>
+          </div>
+          <span class="time time-r">{{format(totalDurationTime)}}</span>
+        </div>
         <div class="bottom">
           <span class="iconfont">&#xe66d;</span>
-          <span class="iconfont">&#xe6e1;</span>
           <span class="iconfont"
-                style="font-size:60px;">&#xe696;</span>
-          <span class="iconfont">&#xe718;</span>
+                @click="prev">&#xe6e1;</span>
+          <span class="iconfont"
+                style="font-size:60px;"
+                @click="togglePlaying"
+                v-html="playIcon"></span>
+          <span class="iconfont"
+                @click="next">&#xe718;</span>
           <span class="iconfont">&#xe802;</span>
         </div>
       </div>
     </div>
     <!--mini播放器 -->
     <div class="mini-player"
-         v-show="!fullScreen">
+         v-show="!fullScreen"
+         @click="openNormalPlayer">
+      <img :src="currentSong.backImage" />
+      <div class="info">
+        <p>{{currentSong.name}}</p>
+        <p>横滑可以切换上下首哦</p>
+      </div>
+      <div class="icon">
+        <span class="iconfont"
+              @click.stop="togglePlaying"
+              v-html="miniIcon"></span>
+        <span class="iconfont">&#xe802;</span>
+      </div>
     </div>
+    <audio :src="currentSong.playUrl"
+           ref="normalPlay"
+           @canplay="ready"
+           @timeupdate="updateTime"
+           @durationchange="durationTime"
+           @error="error">您的浏览器不支持audio标签</audio>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { getSongDate } from '@/utils'
+import ProgressBar from '@/components/ProgressBar'
 export default {
   name: 'Player',
+  components: {
+    ProgressBar
+  },
+  data () {
+    return {
+      songReady: false,
+      currentTime: 0,
+      totalDurationTime: 0
+    }
+  },
   computed: {
+    playIcon () {
+      return this.playing ? '&#xe769;' : '&#xe696;'
+    },
+    cdCls () {
+      return this.playing ? 'play' : 'play pause'
+    },
+    miniIcon () {
+      return this.playing ? '&#xe769;' : '&#xe696;'
+    },
+    percent () {
+      return this.currentTime / this.totalDurationTime
+    },
     ...mapGetters([
       'fullScreen',
       'playlist',
-      'currentSong'
+      'currentSong',
+      'playing',
+      'currentIndex',
+      'nextSong',
+      'prevSong'
     ])
   },
+  watch: {
+    async currentSong () {
+      this.$nextTick(() => {
+        if (this.playing) {
+          this.$refs.normalPlay.play()
+        }
+      })
+    },
+    playing (newPlaying) {
+      this.$nextTick(() => {
+        const audio = this.$refs.normalPlay
+        newPlaying ? audio.play() : audio.pause()
+      })
+    }
+  },
   methods: {
+    ...mapMutations({
+      setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setSong: 'SET_SONG'
+    }),
+    ...mapActions([
+      'selectPlay'
+    ]),
+    // 页面后退
     back () {
       this.setFullScreen(false)
     },
-    ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN'
-    })
+    // 进入全屏播放器
+    openNormalPlayer () {
+      this.setFullScreen(true)
+    },
+    // audio歌曲准备完毕事件
+    ready () {
+      this.songReady = true
+    },
+    // audio歌曲发生错误事件
+    error () {
+      this.songReady = true
+    },
+    // 下一曲
+    async next () {
+      // 先判断歌曲是否准备好 防止快速切换歌曲
+      let currentSong = this.nextSong
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex + 1
+      if (index === this.playlist.length) {
+        index = 0
+      }
+      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
+      if (this.nextSong.backImage === undefined) {
+        const result = await getSongDate(this.nextSong)
+        currentSong.backImage = result.backImage
+        currentSong.singer = result.singer
+        currentSong.playUrl = result.playUrl
+        this.setSong(currentSong, index)
+      }
+      this.setCurrentIndex(index)
+      this.songReady = false
+    },
+    // 上一曲
+    async prev () {
+      // 先判断歌曲是否准备好 防止快速切换歌曲
+      let currentSong = this.prevSong
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex - 1
+      if (index === -1) {
+        index = this.playlist.length - 1
+      }
+      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
+      if (this.nextSong.backImage === undefined) {
+        const result = await getSongDate(this.nextSong)
+        currentSong.backImage = result.backImage
+        currentSong.singer = result.singer
+        currentSong.playUrl = result.playUrl
+        this.setSong(currentSong, index)
+      }
+      this.setCurrentIndex(index)
+      this.songReady = false
+    },
+    // 控制音乐播放与暂停
+    togglePlaying () {
+      this.setPlayingState(!this.playing)
+    },
+    // 歌曲播放的当前时间
+    updateTime (e) {
+      this.currentTime = e.target.currentTime
+    },
+    // 歌曲总时长
+    durationTime (e) {
+      this.totalDurationTime = e.target.duration
+    },
+    // 时间格式化
+    format (interval) {
+      interval = interval | 0
+      const minute = interval / 60 | 0
+      const second = this._pad(interval % 60)
+      return `${minute}:${second}`
+    },
+    // 小数点补位
+    _pad (num, n = 2) {
+      let len = num.toString().length
+      while (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
+    },
+    // 监听进度条滑动
+    onProgressBarChange (percent) {
+      const currentTime = this.totalDurationTime * percent
+      this.$refs.normalPlay.currentTime = currentTime
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+    }
   }
 }
 </script>
@@ -135,6 +307,10 @@ export default {
       border 2px solid #131313
       box-shadow 0 0 0 5px #343935
       opacity 0.7
+      &.play
+        animation rotate 20s linear infinite
+      &.pause
+        animation-play-state paused
       .song-img
         position absolute
         top 50%
@@ -162,9 +338,23 @@ export default {
         align-items center
         .iconfont
           font-size 20px
-      .range
+      .progress-wrapper
         width 100%
         height 30px
+        display flex
+        align-items center
+        .time
+          flex 0 0 30px
+          line-height 30px
+          width 30px
+          &.time-l
+            text-align left
+            padding-left 10px
+          &.time-r
+            text-align right
+            padding-right 10px
+        .progress-bar-wrapper
+          flex 1
       .bottom
         width 80%
         margin 0 auto
@@ -173,4 +363,33 @@ export default {
         align-items center
         .iconfont
           font-size 20px
+  .mini-player
+    position fixed
+    left 0
+    bottom 0
+    z-index 180
+    width 100%
+    height 50px
+    display flex
+    align-items center
+    border-top 1px solid #f1e9e9
+    background white
+    img
+      border-radius 10px
+      padding 5px
+      height 90%
+    .info
+      width 70%
+      p
+        padding 5px
+    .icon
+      width calc(30% - 45px)
+      .iconfont
+        font-size 0.6rem
+        margin-right 5px
+  @keyframes rotate
+    0%
+      transform rotate(0)
+    100%
+      transform rotate(360deg)
 </style>

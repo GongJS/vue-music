@@ -42,7 +42,7 @@
 
 <script>
 import ShowLoading from '@/components/ShowLoading'
-import { getData } from '@/utils'
+import { getSongDate } from '@/utils'
 export default {
   name: 'SongList',
   props: {
@@ -64,10 +64,6 @@ export default {
     showLoading: {
       type: Boolean,
       default: true
-    },
-    bgImage: {
-      type: String,
-      default: ''
     }
   },
   components: {
@@ -75,13 +71,13 @@ export default {
   },
   methods: {
     async selectItem (item, index) {
+      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
       let backImage
-      // 获取歌曲所属专辑的封面
-      const result = await getData('/album', item.al.id)
-      if (result.code === 200) {
-        backImage = result.album.blurPicUrl
-      }
-      this.$emit('select', backImage, index)
+      let playUrl
+      const result = await getSongDate(item)
+      backImage = result.backImage
+      playUrl = result.playUrl
+      this.$emit('select', backImage, playUrl, index)
     }
   }
 }
