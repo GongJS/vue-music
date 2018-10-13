@@ -49,7 +49,9 @@
           <span class="time time-r">{{format(totalDurationTime)}}</span>
         </div>
         <div class="bottom">
-          <span class="iconfont">&#xe66d;</span>
+          <span class="iconfont"
+                v-html="iconMode"
+                @click="changeMode"></span>
           <span class="iconfont"
                 @click="prev">&#xe6e1;</span>
           <span class="iconfont"
@@ -86,15 +88,17 @@
            @canplay="ready"
            @timeupdate="updateTime"
            @durationchange="durationTime"
+           @ended="end"
            @error="error">您的浏览器不支持audio标签</audio>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { getSongDate } from '@/utils'
+import { getSongDate, shuffle } from '@/utils'
 import ProgressBar from '@/components/ProgressBar'
 import ProgressCircle from '@/components/ProgressCircle'
+import { playMode } from '@/config'
 export default {
   name: 'Player',
   components: {
@@ -116,6 +120,9 @@ export default {
     cdCls () {
       return this.playing ? 'play' : 'play pause'
     },
+    iconMode () {
+      return this.mode === playMode.sequence ? '&#xe6aa;' : this.mode === playMode.loop ? '&#xe66d;' : '&#xe77d;'
+    },
     miniIcon () {
       return this.playing ? '&#xe7af;' : '&#xe696;'
     },
@@ -129,7 +136,9 @@ export default {
       'playing',
       'currentIndex',
       'nextSong',
-      'prevSong'
+      'prevSong',
+      'mode',
+      'sequenceList'
     ])
   },
   watch: {
@@ -152,7 +161,9 @@ export default {
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
-      setSong: 'SET_SONG'
+      setSong: 'SET_SONG',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
     }),
     ...mapActions([
       'selectPlay'
@@ -172,6 +183,40 @@ export default {
     // audio歌曲发生错误事件
     error () {
       this.songReady = true
+    },
+    // 歌曲播放完毕触发事件
+    end () {
+      console.log(this.mode, playMode.loop)
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        this.next()
+      }
+    },
+    // 歌曲循环
+    loop () {
+      this.$refs.normalPlay.currentTime = 0
+      this.$refs.normalPlay.play()
+    },
+    // 改变播放模式
+    changeMode () {
+      const mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list)
+      this.setPlayList(list)
+    },
+    // 在切换播放模式的时候，找到原先播放的那首歌
+    resetCurrentIndex (list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
     },
     // 下一曲
     async next () {

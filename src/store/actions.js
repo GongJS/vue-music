@@ -1,8 +1,22 @@
 import * as types from './mutation-types'
+import { shuffle } from '@/utils'
+import { playMode } from '@/config'
 
-export const selectPlay = function ({commit, state}, {list, index}) {
+function findIndex (list, song) {
+  return list.findIndex(item => {
+    return item.id === song.id
+  })
+}
+
+export const selectPlay = function ({ commit, state }, { list, index }) {
   commit(types.SET_SEQUENCE_LIST, list)
-  commit(types.SET_PLAYLIST, list)
+  if (state.mode === playMode.random) {
+    let randomList = shuffle(list)
+    commit(types.SET_PLAYLIST, randomList)
+    index = findIndex(randomList, list[index])
+  } else {
+    commit(types.SET_PLAYLIST, list)
+  }
   commit(types.SET_CURRENT_INDEX, index)
   commit(types.SET_FULL_SCREEN, true)
   commit(types.SET_PLAYING_STATE, true)
