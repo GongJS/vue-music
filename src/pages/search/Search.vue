@@ -1,31 +1,42 @@
 <template>
-  <div class="search" @click="cancalFrame" ref="search">
+  <div class="search"
+       @click="cancalFrame"
+       ref="search">
     <!--搜索框 -->
-    <div class="header" @click.stop>
-      <div class="back" @click="back">
+    <div class="header"
+         @click.stop>
+      <div class="back"
+           @click="back">
         <span class="iconfont">&#xe72a;</span>
       </div>
       <div class="input">
-        <input v-model="inputData" @focus="handleFocus"/>
-        <span v-if="showDelete" @click="handleDelete" class="iconfont delete">&#xe61a;</span>
+        <input v-model="inputData"
+               @focus="handleFocus" />
+        <span v-if="showDelete"
+              @click="handleDelete"
+              class="iconfont delete">&#xe61a;</span>
       </div>
     </div>
-     <!--搜索建议下拉框 -->
-    <div class="frame" v-show="showFrame" @click="handleSearch">
-      <p :data-search="inputData" class="title border-bottom">搜索 "{{inputData}}"</p>
+    <!--搜索建议下拉框 -->
+    <div class="frame"
+         v-show="showFrame"
+         @click="handleSearch">
+      <p :data-search="inputData"
+         class="title border-bottom">搜索 "{{inputData}}"</p>
       <p v-for="item in suggestContent"
-        :key="item.id"
-        :data-search="item.name"
-        :data-singer="item.artists[0].name"
-        class="title border-bottom"
-      >
+         :key="item.id"
+         :data-search="item.name"
+         :data-singer="item.artists[0].name"
+         class="title border-bottom">
         <span class="iconfont">&#xe678;</span>
         {{item.name}} {{item.artists[0].name}}
       </p>
     </div>
     <!--歌手分类跳转 -->
     <div v-if="next">
-      <router-link tag="div" class="classify border-bottom" to="/search/singerclassify">
+      <router-link tag="div"
+                   class="classify border-bottom"
+                   to="/search/singerclassify">
         <span class="iconfont fontSize">&#xe607;</span>
         <span>歌手分类</span>
         <span class="iconfont">&#xe624;</span>
@@ -36,58 +47,62 @@
         </span>
         <!--热门搜索 -->
         <div class="hotItems">
-          <span
-            v-for="(item, index) in hotsSearch"
-            :key="index"
-            class="item"
-            @click="hotSelect($event, item)">
+          <span v-for="(item, index) in hotsSearch"
+                :key="index"
+                class="item"
+                @click="hotSelect($event, item)">
             {{item}}
           </span>
         </div>
       </div>
       <!--搜索记录 -->
-      <div class="searchHistory">
-        <div
-          class=" border-bottom"
-          v-for="(item, index) in searchHistory"
-          :key="index"
-        >
-          <span class="iconfont">&#xe636;</span>
-          <span class="content" @click="historySelect($event, item)">{{item}}</span>
-          <span @click="deleteHistory(item)" class="iconfont delete">&#xe61a;</span>
-        </div>
+      <div class="searchHistory"
+           ref="searchHistory">
+        <scroll ref="searchScroll"
+                class="searchScroll"
+                :data="searchHistory">
+          <div>
+            <div class=" border-bottom"
+                 v-for="(item, index) in searchHistory"
+                 :key="index">
+              <span class="iconfont">&#xe636;</span>
+              <span class="content"
+                    @click="historySelect($event, item)">{{item}}</span>
+              <span @click="deleteHistory(item)"
+                    class="iconfont delete">&#xe61a;</span>
+            </div>
+          </div>
+        </scroll>
       </div>
     </div>
     <!--搜索结果 -->
-    <div class="searchResult" v-else>
-      <tab :tabs="tabs" @switchTab="switchTab"></tab>
-      <div class="scroll" >
-        <scroll class="scroll-content" :data="songs">
+    <div class="searchResult"
+         v-else>
+      <tab :tabs="tabs"
+           @switchTab="switchTab"></tab>
+      <div class="scroll">
+        <scroll class="scroll-content"
+                :data="songs">
           <keep-alive>
             <!--单曲-->
-            <song-list
-              :songs="songs"
-              :showLoading="showLoading"
-              v-if="songState"
-            >
+            <song-list :songs="songs"
+                       :showLoading="showLoading"
+                       v-if="songState"
+                       @select="selectItem">
             </song-list>
             <!--专辑-->
-            <album-list
-              :inputData="inputData"
-              :showLoading="showLoading"
-              :inputState="inputState"
-              v-else-if="albumState"
-            >
+            <album-list :inputData="inputData"
+                        :showLoading="showLoading"
+                        :inputState="inputState"
+                        v-else-if="albumState">
             </album-list>
             <!--视频-->
             <vedio v-else-if="vedioState"></vedio>
             <!--歌手-->
-            <singer
-              :inputData="inputData"
-              :showLoading="showLoading"
-              :inputState="inputState"
-              v-else-if="singerState"
-            >
+            <singer :inputData="inputData"
+                    :showLoading="showLoading"
+                    :inputState="inputState"
+                    v-else-if="singerState">
             </singer>
           </keep-alive>
         </scroll>
@@ -97,7 +112,9 @@
 </template>
 
 <script>
-import {getData} from '@/utils'
+import { getData } from '@/utils'
+import { playlistMixin } from '@/mixin'
+import { mapActions } from 'vuex'
 import Tab from '@/components/Tab'
 import SongList from './SongList'
 import AlbumList from './AlbumList'
@@ -106,6 +123,7 @@ import Singer from './Singer'
 import Scroll from '@/components/Scroll'
 export default {
   name: 'Search',
+  mixins: [playlistMixin],
   components: {
     Tab,
     SongList,
@@ -147,6 +165,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'selectPlay'
+    ]),
     // 清除输入
     handleDelete () {
       this.inputData = ''
@@ -286,16 +307,36 @@ export default {
       }
       this.searchHistory = arr
       localStorage.setItem('searchHistory', JSON.stringify(arr))
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      setTimeout(() => {
+        console.log(this.$refs.searchHistory.style, this.$refs.searchScroll)
+        const bottom = playlist.length > 0 ? '102px' : ''
+        this.$refs.searchHistory.style.bottom = bottom
+        this.$refs.searchScroll.refresh()
+      }, 20)
+    },
+    // 选择播放歌曲
+    selectItem (backImage, playUrl, index, lyric) {
+      this.songs[index].backImage = backImage
+      this.songs[index].playUrl = playUrl
+      this.songs[index].lyric = lyric
+      this.songs[index].singer = this.name
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
     }
   },
   created () {
     this.requestHotSearch()
     this.searchHistory = JSON.parse(localStorage.getItem('searchHistory'))
     this.tabs = [
-      {title: '单曲'},
-      {title: '视频'},
-      {title: '歌手'},
-      {title: '专辑'}
+      { title: '单曲' },
+      { title: '视频' },
+      { title: '歌手' },
+      { title: '专辑' }
     ]
   },
   mounted () {
@@ -403,22 +444,29 @@ export default {
       color #657B92
       margin-left 5px
   .searchHistory
-    width 95%
-    margin 10px auto
-    height 30px
+    position fixed
+    width 90%
+    left 5%
+    right 5%
+    top 180px
+    bottom 35px
     line-height 30px
-    .content
-      margin-left 5px
-    .delete
-      float right
-      font-size 12px
+    .searchScroll
+      height 100%
+      overflow hidden
+      .content
+        margin-left 5px
+        height 30px
+      .delete
+        float right
+        font-size 12px
   .searchResult
-      .scroll
-        position fixed
-        top 95px
-        bottom 0
-        width 100%
-        .scroll-content
-          height 100%
-          overflow hidden
+    .scroll
+      position fixed
+      top 95px
+      bottom 0
+      width 100%
+      .scroll-content
+        height 100%
+        overflow hidden
 </style>

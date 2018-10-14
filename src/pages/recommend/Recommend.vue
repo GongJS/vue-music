@@ -1,15 +1,16 @@
 <template>
-  <div class="recommend">
-    <scroll  class="recommend-content" :data="banners">
+  <div class="recommend"
+       ref="recommend">
+    <scroll class="recommend-content"
+            ref="scroll"
+            :data="banners">
       <div>
         <swiper :banners="banners"></swiper>
         <iconfont />
-        <home-item
-          v-for="(item, index) in items"
-          :key="index"
-          :title="item.title"
-          :url="item.url"
-        >
+        <home-item v-for="(item, index) in items"
+                   :key="index"
+                   :title="item.title"
+                   :url="item.url">
         </home-item>
       </div>
     </scroll>
@@ -21,9 +22,11 @@ import Swiper from '@/components/swiper'
 import Iconfont from './Iconfont'
 import Scroll from '@/components/Scroll'
 import HomeItem from '@/components/HomeItem'
-import {getData} from '@/utils'
+import { getData } from '@/utils'
+import { playlistMixin } from '@/mixin'
 export default {
   name: 'Home',
+  mixins: [playlistMixin],
   components: {
     Swiper,
     Iconfont,
@@ -44,6 +47,12 @@ export default {
         items.push(result.banners[i].picUrl)
       }
       this.banners = items
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? '102px' : ''
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll.refresh()
     }
   },
   created () {
@@ -66,13 +75,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
- @import '~styles/varibles.styl'
-    .recommend
-      position fixed
-      width 100%
-      top 85px
-      bottom 0
-      .recommend-content
-        height: 100%
-        overflow: hidden
+@import '~styles/varibles.styl'
+.recommend
+  position fixed
+  width 100%
+  top 85px
+  bottom 0
+  .recommend-content
+    height 100%
+    overflow hidden
 </style>

@@ -17,20 +17,32 @@ export function getData (url, id) {
   })
 }
 
-// 根据id获取歌曲的音乐url，专辑背景，歌手名称
+// 根据id获取歌曲的音乐url，专辑背景，歌手名称， 歌词
 export async function getSongDate (obj) {
+  console.log(obj.id)
   let songInfo = {}
-  const result = await getData('/album', obj.al.id)
-  if (result.code === 200) {
-    songInfo.backImage = result.album.blurPicUrl
-    songInfo.singer = result.album.artist.name
+  let albumData = null
+  songInfo.playUrl = `http://music.163.com/song/media/outer/url?id=${
+    obj.id
+  }.mp3`
+  if (obj.al === undefined) {
+    console.log(22)
+    albumData = await getData('/album', obj.album.id)
+  } else {
+    console.log(33)
+    albumData = await getData('/album', obj.al.id)
   }
-  const data = await getData('/music/url', obj.id)
-  if (data.code === 200) {
-    songInfo.playUrl = data.data[0].url
+  if (albumData.code === 200) {
+    songInfo.backImage = albumData.album.blurPicUrl
+    songInfo.singer = albumData.album.artist.name
+  }
+  const lyricData = await getData('/lyric', obj.id)
+  if (lyricData.code === 200) {
+    songInfo.lyric = lyricData.lrc.lyric
   }
   return songInfo
 }
+
 // 添加class前缀
 let elementStyle = document.createElement('div').style
 

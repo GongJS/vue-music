@@ -71,13 +71,18 @@ export default {
   },
   methods: {
     async selectItem (item, index) {
-      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
+      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，歌词，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
+      if (item.backImage !== undefined) {
+        return
+      }
       let backImage
       let playUrl
+      let lyric
       const result = await getSongDate(item)
       backImage = result.backImage
       playUrl = result.playUrl
-      this.$emit('select', backImage, playUrl, index)
+      lyric = result.lyric
+      this.$emit('select', backImage, playUrl, index, lyric)
     }
   }
 }

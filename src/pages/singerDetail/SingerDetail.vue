@@ -166,9 +166,10 @@ export default {
       console.log('分享')
     },
     // 选择播放歌曲
-    selectItem (backImage, playUrl, index) {
+    selectItem (backImage, playUrl, index, lyric) {
       this.songs[index].backImage = backImage
       this.songs[index].playUrl = playUrl
+      this.songs[index].lyric = lyric
       this.songs[index].singer = this.name
       this.selectPlay({
         list: this.songs,

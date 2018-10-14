@@ -24,22 +24,44 @@
              height="100%"
              :src="currentSong.backImage">
       </div>
-      <!--圆形碟片 CD-->
-      <div class="disc"
-           :class="cdCls">
-        <div class="song-img"
-             :style="`background-image:url(${currentSong.backImage})`"
-             ref="rotate">
+      <!--圆形碟片CD ||  歌词 -->
+      <div class="middle"
+           @click="switchLyric">
+        <div class="disc"
+             :class="cdCls"
+             v-show="!showLyric">
+          <div class="song-img"
+               :style="`background-image:url(${currentSong.backImage})`"
+               ref="rotate">
+          </div>
         </div>
-      </div>
-      <!--normal 播放器 -->
-      <div class="footer">
-        <div class="top">
+        <div class="func"
+             v-show="!showLyric">
           <span class="iconfont">&#xe613;</span>
           <span class="iconfont">&#xe646;</span>
           <span class="iconfont">&#xe748;</span>
           <span class="iconfont">&#xe6b2;</span>
         </div>
+        <scroll v-show="showLyric"
+                class="lyric"
+                v-if="currentLyric"
+                :data="currentLyric && currentLyric.lines"
+                ref="lyricList">
+          <div class="lyric-wrapper">
+            <div>
+              <p ref="lyricLine"
+                 class="text"
+                 :class="{'current': currentLineNum ===index}"
+                 v-for="(line, index) in currentLyric.lines"
+                 :key="index">
+                {{line.txt}}
+              </p>
+            </div>
+          </div>
+        </scroll>
+      </div>
+      <!--normal 播放器 -->
+      <div class="footer">
         <div class="progress-wrapper">
           <span class="time time-l">{{format(currentTime)}}</span>
           <div class="progress-bar-wrapper">
@@ -96,21 +118,28 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { getSongDate, shuffle } from '@/utils'
+import { playMode } from '@/config'
 import ProgressBar from '@/components/ProgressBar'
 import ProgressCircle from '@/components/ProgressCircle'
-import { playMode } from '@/config'
+import Scroll from '@/components/Scroll'
+import Lyric from 'lyric-parser'
 export default {
   name: 'Player',
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   },
   data () {
     return {
       songReady: false,
       currentTime: 0,
       totalDurationTime: 0,
-      radius: 45
+      radius: 45,
+      showLyric: false,
+      currentLyric: null,
+      currentLineNum: 0,
+      playingLyric: ''
     }
   },
   computed: {
@@ -142,12 +171,21 @@ export default {
     ])
   },
   watch: {
-    async currentSong () {
-      this.$nextTick(() => {
+    async currentSong (newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return
+      }
+      if (this.currentLyric) {
+        this.currentLyric.stop()
+      }
+      // 延时1秒，是为了保证在微信端从后台切换到前台，audio的ready事件可以正常触发
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         if (this.playing) {
           this.$refs.normalPlay.play()
+          this.getLyric()
         }
-      })
+      }, 1000)
     },
     playing (newPlaying) {
       this.$nextTick(() => {
@@ -186,7 +224,6 @@ export default {
     },
     // 歌曲播放完毕触发事件
     end () {
-      console.log(this.mode, playMode.loop)
       if (this.mode === playMode.loop) {
         this.loop()
       } else {
@@ -197,6 +234,9 @@ export default {
     loop () {
       this.$refs.normalPlay.currentTime = 0
       this.$refs.normalPlay.play()
+      if (this.currentLyric) {
+        this.currentLyric.seek(0)
+      }
     },
     // 改变播放模式
     changeMode () {
@@ -225,19 +265,24 @@ export default {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex + 1
-      if (index === this.playlist.length) {
-        index = 0
+      if (this.playlist.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playlist.length) {
+          index = 0
+        }
+        // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
+        if (this.nextSong.backImage === undefined) {
+          const result = await getSongDate(this.nextSong)
+          currentSong.backImage = result.backImage
+          currentSong.singer = result.singer
+          currentSong.playUrl = result.playUrl
+          currentSong.lyric = result.lyric
+          this.setSong(currentSong, index)
+        }
+        this.setCurrentIndex(index)
       }
-      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
-      if (this.nextSong.backImage === undefined) {
-        const result = await getSongDate(this.nextSong)
-        currentSong.backImage = result.backImage
-        currentSong.singer = result.singer
-        currentSong.playUrl = result.playUrl
-        this.setSong(currentSong, index)
-      }
-      this.setCurrentIndex(index)
       this.songReady = false
     },
     // 上一曲
@@ -247,24 +292,35 @@ export default {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playlist.length - 1
+      if (this.playlist.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playlist.length - 1
+        }
+        // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，歌词，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
+        if (this.nextSong.backImage === undefined) {
+          const result = await getSongDate(this.nextSong)
+          currentSong.backImage = result.backImage
+          currentSong.singer = result.singer
+          currentSong.playUrl = result.playUrl
+          currentSong.lyric = result.lyric
+          this.setSong(currentSong, index)
+        }
+        this.setCurrentIndex(index)
       }
-      // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
-      if (this.nextSong.backImage === undefined) {
-        const result = await getSongDate(this.nextSong)
-        currentSong.backImage = result.backImage
-        currentSong.singer = result.singer
-        currentSong.playUrl = result.playUrl
-        this.setSong(currentSong, index)
-      }
-      this.setCurrentIndex(index)
       this.songReady = false
     },
     // 控制音乐播放与暂停
     togglePlaying () {
+      if (!this.songReady) {
+        return
+      }
       this.setPlayingState(!this.playing)
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay()
+      }
     },
     // 歌曲播放的当前时间
     updateTime (e) {
@@ -297,6 +353,34 @@ export default {
       if (!this.playing) {
         this.togglePlaying()
       }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000)
+      }
+    },
+    // 切换歌词显示
+    switchLyric () {
+      this.showLyric = !this.showLyric
+    },
+    // 初始化歌词
+    getLyric () {
+      this.currentLyric = new Lyric(this.currentSong.lyric, this.handleLyric)
+      this.currentLyric.play()
+    },
+    // 处理歌词显示效果
+    handleLyric ({ lineNum, txt }) {
+      this.currentLineNum = lineNum
+      if (lineNum > 5) {
+        let lineEl = this.$refs.lyricLine[lineNum - 5]
+        this.$refs.lyricList.scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
+      }
+      this.playingLyric = txt
+    }
+  },
+  created () {
+    if (this.currentSong.lyric) {
+      this.getLyric()
     }
   }
 }
@@ -312,7 +396,7 @@ export default {
     top 0
     bottom 0
     z-index 200
-    background black
+    background #222
     .header
       width 100%
       color white
@@ -346,49 +430,74 @@ export default {
       z-index -1
       opacity 0.6
       filter blur(20px)
-    .disc
-      position relativ
-      margin-top 20%
-      margin-left calc(((100% - 240px) / 2))
-      width 240px
-      height 240px
-      border-radius 240px
-      transform rotate(45deg)
-      background-image radial-gradient(5em 8em ellipse, #fff, #000)
-      border 2px solid #131313
-      box-shadow 0 0 0 5px #343935
-      opacity 0.7
-      &.play
-        animation rotate 20s linear infinite
-      &.pause
-        animation-play-state paused
-      .song-img
+    .middle
+      height calc(100% - 200px)
+      position relative
+      z-index 100
+      .disc
+        position relativ
+        margin-top 20%
+        margin-left calc(((100% - 240px) / 2))
+        width 240px
+        height 240px
+        border-radius 240px
+        transform rotate(45deg)
+        background-image radial-gradient(5em 8em ellipse, #fff, #000)
+        border 2px solid #131313
+        box-shadow 0 0 0 5px #343935
+        opacity 0.7
+        &.play
+          animation rotate 20s linear infinite
+        &.pause
+          animation-play-state paused
+        .song-img
+          position absolute
+          top 50%
+          left 50%
+          transform-origin center center
+          transform translate(-50%, -50%) rotate(0deg)
+          width 170px
+          height 170px
+          background-size cover
+          background-repeat no-repeat
+          background-position center
+          border 2px solid #000
+          border-radius 200px
+      .func
         position absolute
-        top 50%
-        left 50%
-        transform-origin center center
-        transform translate(-50%, -50%) rotate(0deg)
-        width 170px
-        height 170px
-        background-size cover
-        background-repeat no-repeat
-        background-position center
-        border 2px solid #000
-        border-radius 200px
+        bottom 0px
+        left 15%
+        right 15%
+        width 70%
+        display flex
+        justify-content space-around
+        align-items center
+        color white
+        .iconfont
+          font-size 20px
+      .lyric
+        display inline-block
+        vertical-align top
+        width 100%
+        height 100%
+        overflow hidden
+        .lyric-wrapper
+          width 80%
+          margin 0 auto
+          overflow hidden
+          text-align center
+          .text
+            line-height 32px
+            color raba(255, 255, 255, 0.5)
+            font-size 14px
+            &.current
+              color white
     .footer
       width 100%
       color white
       position absolute
-      bottom 0
-      height 100px
-      .top
-        width 70%
-        margin 0 auto
-        display flex
-        justify-content space-around
-        align-items center
-        .iconfont
-          font-size 20px
+      bottom 10px
+      height 60px
       .progress-wrapper
         width 100%
         height 30px

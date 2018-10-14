@@ -1,33 +1,48 @@
 <template>
-  <div class="albums">
+  <div>
     <!--加载动画-->
-    <show-loading v-if="showLoading"/>
-    <div v-else>
-      <!--专辑列表信息-->
-      <div v-for="item in albums" :key="item.id" class="album-list">
-        <div v-show="showMask" class="mask"></div>
-        <div class="albumImg">
-          <img v-lazy="item.blurPicUrl" />
+    <show-loading v-if="showLoading" />
+    <!--专辑列表信息-->
+    <div v-else
+         class="content"
+         ref="album">
+      <scroll class="album-content"
+              :data="albums"
+              ref="scroll">
+        <div>
+          <div v-for="item in albums"
+               :key="item.id"
+               class="album-list">
+            <div v-show="showMask"
+                 class="mask"></div>
+            <div class="albumImg">
+              <img v-lazy="item.blurPicUrl" />
+            </div>
+            <div class="info border-bottom">
+              <p class="name">{{item.name}}</p>
+              <p class="date">
+                {{formatTime(item.publishTime)}} 歌曲 {{item.size}}
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="info border-bottom">
-          <p class="name">{{item.name}}</p>
-          <p class="date">
-            {{formatTime(item.publishTime)}} 歌曲 {{item.size}}
-          </p>
-        </div>
-      </div>
+      </scroll>
     </div>
   </div>
 </template>
 
 <script>
 import ShowLoading from '@/components/ShowLoading'
-import {getData} from '@/utils'
+import { getData } from '@/utils'
+import { playlistMixin } from '@/mixin'
+import Scroll from '@/components/Scroll'
 export default {
   name: 'AlbumList',
+  mixins: [playlistMixin],
   props: ['inputData', 'showLoading', 'inputState'],
   components: {
-    ShowLoading
+    ShowLoading,
+    Scroll
   },
   data () {
     return {
@@ -44,7 +59,6 @@ export default {
   methods: {
     // 获取专辑
     async requestAlbum () {
-      console.log(this.inputData)
       const result = await getData(`/search?keywords=${this.inputData}&type=10`)
       let items = []
       if (result.code === 200) {
@@ -59,6 +73,12 @@ export default {
     formatTime (time) {
       let date = new Date(time)
       return date.toLocaleString().slice(0, 8).replace(/\//g, '.')
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? '102px' : ''
+      this.$refs.album.style.bottom = bottom
+      this.$refs.scroll.refresh()
     }
   },
   created () {
@@ -67,9 +87,14 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-  .albums
-    background white
-    min-height 800px
+.content
+  position fixed
+  width 100%
+  top 88px
+  bottom 0
+  .album-content
+    height 100%
+    overflow hidden
     .album-list
       position relative
       display flex
