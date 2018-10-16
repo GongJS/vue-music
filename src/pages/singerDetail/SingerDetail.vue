@@ -54,7 +54,7 @@
               class="list"
               ref="list">
         <div>
-          <div class="song-list-wrapper">
+          <div>
             <keep-alive>
               <song-list v-if="songState"
                          :name="name"
@@ -84,8 +84,10 @@ import SingerInfo from './singerInfo'
 import Vedio from './Vedio'
 import { getData } from '@/utils'
 import { mapActions } from 'vuex'
+import { playlistMixin } from '@/mixin'
 export default {
   name: 'SingerDetail',
+  mixins: [playlistMixin],
   components: {
     Scroll,
     SongList,
@@ -221,6 +223,15 @@ export default {
         }
         this.songs = items
       }
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      if (playlist.length === 0) {
+        return
+      }
+      const bottom = playlist.length > 0 ? '102px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      this.$refs.list.refresh()
     }
   },
   created () {
@@ -344,6 +355,7 @@ export default {
     position relative
     background white
     height 40px
+    z-index 200
   &.list-fade-enter-active, &.list-fade-leave-active
     transition opacity 0.3s
     .list

@@ -55,7 +55,10 @@ export default {
     },
     // 当播放器变成mini播放器的时候，重新计算scroll的高度
     handlePlaylist (playlist) {
-      const bottom = playlist.length > 0 ? '102px' : ''
+      if (playlist.length === 0) {
+        return
+      }
+      const bottom = '102px'
       this.$refs.classify.style.bottom = bottom
       this.$refs.singerClassify.refresh()
     }

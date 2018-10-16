@@ -4,7 +4,7 @@
     <show-loading v-if="showLoading" />
     <!--歌曲列表信息 -->
     <div v-else
-         class="content"
+         class="song"
          ref="song">
       <scroll class="song-content"
               :data="songs"
@@ -13,7 +13,7 @@
           <div v-for="(item, index) in songs"
                :key="index"
                class="song-list border-bottom">
-            <div class="item"
+            <div class="content"
                  @click="selectItem(item, index)">
               <div class="info">
                 <div class="name">{{item.name}}</div>
@@ -38,9 +38,9 @@
 
 <script>
 import ShowLoading from '@/components/ShowLoading'
-import { getSongDate } from '@/utils'
-import { playlistMixin } from '@/mixin'
 import Scroll from '@/components/Scroll'
+import { playlistMixin } from '@/mixin'
+import { getSongDate } from '@/utils'
 export default {
   name: 'SongList',
   mixins: [playlistMixin],
@@ -86,12 +86,10 @@ export default {
     },
     // 当播放器变成mini播放器的时候，重新计算scroll的高度
     handlePlaylist (playlist) {
-      console.log(this.songs)
-      if (playlist.length === 0) {
+      if (playlist.length === 0 || this.showLoading === true) {
         return
       }
-      console.log(playlist, 222)
-      const bottom = playlist.length > 0 ? '102px' : ''
+      const bottom = '102px'
       this.$refs.song.style.bottom = bottom
       this.$refs.scroll.refresh()
     }
@@ -99,7 +97,7 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-.content
+.song
   position fixed
   width 100%
   top 88px
@@ -108,13 +106,12 @@ export default {
     height 100%
     overflow hidden
     .song-list
-      position relative
       height 45px
       box-sizing border-box
       display flex
       justify-content space-between
       align-items center
-      .item
+      .content
         display flex
         align-items center
         height 45px
@@ -122,6 +119,8 @@ export default {
         .info
           display flex
           align-items center
+          flex-wrap wrap
+          height 100%
           margin-left 5px
           .name
             display flex
@@ -132,6 +131,7 @@ export default {
             color #55669A
             font-size 12px
             white-space nowrap
+            overflow hidden
             text-overflow ellipsis
           .singer
             display flex
@@ -141,6 +141,7 @@ export default {
             font-size 10px
             color #9D9D9D
             white-space nowrap
+            overflow hidden
             text-overflow ellipsis
             .artists
               color #7A7A7A

@@ -1,59 +1,71 @@
 <template>
-<div  @click="cancel">
-  <div>
-    <!--header -->
-    <div class="header">
-      <router-link to="/search/singerclassify">
-        <span class="iconfont">&#xe72a;</span>
-      </router-link>
-      <span v-if="title === '热门歌手'">热门歌手</span>
-      <span v-else>{{title}}-{{state ? state.toLocaleUpperCase() : ''}}</span>
-      <span class="filter" @click.stop="filter">筛选</span>
-    </div>
-    <!--遮罩层 -->
-    <div class="masklayer"
-      ref="masklayer"
-      v-show="isFilter"
-    ></div>
-    <!--歌手列表信息 -->
-    <div class="singer">
-      <scroll class="singer-content"
-        :data="items"
-        :listenScroll="listenScroll"
-        :probeType="probeType"
-        :pullup="pullup"
-        @scroll="scroll"
-        @scrollToEnd="scrollToEnd"
-      >
-        <div>
-          <div v-for="item of items" :key="item.id" class="item" @click="selectSinger(item.id)">
-            <img v-lazy="item.img1v1Url">
-            <span>{{item.name}}</span>
-            <div v-if="item.accountId" class="item-right">
-              <span class="iconfont">&#xe7ad;</span>
-              <span>已入驻</span>
+  <div @click="cancel">
+    <div>
+      <!--header -->
+      <div class="header">
+        <router-link to="/search/singerclassify">
+          <span class="iconfont">&#xe72a;</span>
+        </router-link>
+        <span v-if="title === '热门歌手'">热门歌手</span>
+        <span v-else>{{title}}-{{state ? state.toLocaleUpperCase() : ''}}</span>
+        <span class="filter"
+              @click.stop="filter">筛选</span>
+      </div>
+      <!--遮罩层 -->
+      <div class="masklayer"
+           ref="masklayer"
+           v-show="isFilter"></div>
+      <!--歌手列表信息 -->
+      <div class="singer"
+           ref="singer">
+        <scroll class="singer-content"
+                ref="scroll"
+                :data="items"
+                :listenScroll="listenScroll"
+                :probeType="probeType"
+                :pullup="pullup"
+                @scroll="scroll"
+                @scrollToEnd="scrollToEnd">
+          <div>
+            <div v-for="item of items"
+                 :key="item.id"
+                 class="item"
+                 @click="selectSinger(item.id)">
+              <img v-lazy="item.img1v1Url">
+              <span>{{item.name}}</span>
+              <div v-if="item.accountId"
+                   class="item-right">
+                <span class="iconfont">&#xe7ad;</span>
+                <span>已入驻</span>
+              </div>
             </div>
           </div>
-        </div>
-      </scroll>
+        </scroll>
+      </div>
     </div>
+    <!--歌手筛选列表 A B C 。。。。-->
+    <div v-if="isFilter"
+         class="filter-wrapper"
+         @touchstart="touch">
+      <singer-filter v-on:updateList="updateList"
+                     :title="title"
+                     :changeState="state"></singer-filter>
+    </div>
+    <!--加载动画 -->
+    <show-loading v-show="showloading"
+                  class="loading" />
   </div>
-  <!--歌手筛选列表 A B C 。。。。-->
-  <div v-if="isFilter" class="filter-wrapper" @touchstart="touch">
-     <singer-filter v-on:updateList="updateList" :title="title" :changeState="state"></singer-filter>
-  </div>
-  <!--加载动画 -->
-  <show-loading v-show="showloading" class="loading"/>
-</div>
 </template>
 
 <script>
 import Scroll from '@/components/Scroll'
 import SingerFilter from './SingerFilter'
 import ShowLoading from '@/components/ShowLoading'
-import {getData} from '@/utils'
+import { getData } from '@/utils'
+import { playlistMixin } from '@/mixin'
 export default {
   name: 'Singer',
+  mixins: [playlistMixin],
   components: {
     Scroll,
     SingerFilter,
@@ -145,8 +157,17 @@ export default {
       let cat = this.cat
       this.$router.push({
         path: '/search/singerclassify/singer/singerdetail/',
-        query: {id, cat}
+        query: { id, cat }
       })
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      if (playlist.length === 0 || this.showLoading === true) {
+        return
+      }
+      const bottom = '102px'
+      this.$refs.singer.style.bottom = bottom
+      this.$refs.scroll.refresh()
     }
   },
   created () {
@@ -168,8 +189,8 @@ export default {
       this.state = 'a'
     }
     // 判断是否需要重新获取数据
-    if (this.cat !== this.$route.query.cat) {
-      this.cat = this.$route.query.cat
+    if (this.cat !== Number(this.$route.query.cat)) {
+      this.cat = Number(this.$route.query.cat)
       this.request(this.offset, this.cat)
     }
   }
@@ -177,82 +198,74 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-    .header
-      height 45px
-      background #DF433A
-      width 100%
-      line-height 45px
-      .iconfont
-        font-size 18px
-      .filter
-        position absolute
-        right 5px
-      span
-        display inline-block
-        margin-left 10px
-        margin-right 5px
-        font-size 12px
-        color white
-    .masklayer
-      position absolute
-      z-index 1
-      top 0
-      bottom 0
-      left 0
-      right 0
-      background-color: rgba(0,0,0,0.7)
-    .singer
-      position fixed
-      width 100%
-      top 45px
-      bottom 0
-      .singer-content
-        height: 100%
-        overflow: hidden
-        .loading
-          position fixed
-          bottom 0
-          z-index 2
-        .item
-          display flex
-          align-items center
-          height 52px
-          width 100%
-          border-bottom 1px solid #F9F5F5
-          position relative
-          span
-            margin-left 10px
-          .item-right
-            display flex
-            align-items center
-            position absolute
-            right 5px
-            .iconfont
-              color #DF433A
-              font-size 18px
-            span:nth-child(2)
-              font-size 10px
-              display inline-block
-              margin-right 15px
-              margin-left 5px
-              color #BEBEBE
-          img
-            height 46px
-            width 46px
-            margin-left 5px
-            border-radius 4px
-    .filter-wrapper
-      position absolute
-      display flex
-      justify-content center
-      align-items center
-      height 100%
-      width  100%
-      z-index 2
+.header
+  height 45px
+  background #DF433A
+  width 100%
+  line-height 45px
+  .iconfont
+    font-size 18px
+  .filter
+    position absolute
+    right 5px
+  span
+    display inline-block
+    margin-left 10px
+    margin-right 5px
+    font-size 12px
+    color white
+.masklayer
+  position absolute
+  z-index 1
+  top 0
+  bottom 0
+  left 0
+  right 0
+  background-color rgba(0, 0, 0, 0.7)
+.singer
+  position fixed
+  width 100%
+  top 45px
+  bottom 0
+  .singer-content
+    height 100%
+    overflow hidden
     .loading
       position fixed
       bottom 0
       z-index 2
+    .item
+      display flex
+      align-items center
+      height 52px
       width 100%
-      margin 0 auto
+      border-bottom 1px solid #F9F5F5
+      position relative
+      span
+        margin-left 10px
+      .item-right
+        display flex
+        align-items center
+        position absolute
+        right 5px
+        .iconfont
+          color #DF433A
+          font-size 18px
+        span:nth-child(2)
+          font-size 10px
+          display inline-block
+          margin-right 15px
+          margin-left 5px
+          color #BEBEBE
+      img
+        height 46px
+        width 46px
+        margin-left 5px
+        border-radius 4px
+.loading
+  position fixed
+  bottom 0
+  z-index 2
+  width 100%
+  margin 0 auto
 </style>

@@ -1,26 +1,37 @@
 <template>
-  <div class="filter" @touchstart.stop>
-    <div class="title" @click.stop :style="{borderBottom: hasBorder}">请选择</div>
-    <scroll :data="alphabets" class="filter-content"
-      :listenScroll="listenScroll"
-      @scroll="scroll"
-    >
-      <div>
-          <div v-for="(item,index) of alphabets" class="item border-bottom"
-             :key="index"
-             @click.stop="selectItem(item)"
-           >
-           {{item}}
+  <div class="filter"
+       @touchstart.stop>
+    <div class="title"
+         @click.stop
+         :style="{borderBottom: hasBorder}">
+      <p>请选择</p>
+    </div>
+    <div class="content"
+         ref="filter">
+      <scroll :data="alphabets"
+              class="filter-content"
+              :listenScroll="listenScroll"
+              ref="scroll"
+              @scroll="scroll">
+        <div>
+          <div v-for="(item,index) of alphabets"
+               class="item border-bottom"
+               :key="index"
+               @click.stop="selectItem(item)">
+            {{item}}
           </div>
-      </div>
-    </scroll>
+        </div>
+      </scroll>
+    </div>
   </div>
 </template>
 
 <script>
 import Scroll from '@/components/Scroll'
+import { playlistMixin } from '@/mixin'
 export default {
   name: 'SingerFilter',
+  mixins: [playlistMixin],
   props: ['title', 'changeState'],
   components: {
     Scroll
@@ -54,7 +65,6 @@ export default {
         this.$emit('updateList', params)
       }
     },
-
     // 监听滚轮
     scroll (pos) {
       if (pos.y < -10) {
@@ -62,6 +72,12 @@ export default {
       } else {
         this.hasBorder = ''
       }
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? '112px' : ''
+      this.$refs.filter.style.bottom = bottom
+      this.$refs.scroll.refresh()
     }
   },
   created () {
@@ -74,23 +90,36 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .filter
+.filter
+  position relative
+  background white
+  width 80%
+  left 10%
+  top 10px
+  bottom 40px
+  z-index 100
+  .title
+    position fixed
+    top 10px
+    height 40px
+    background white
+    left 10%
+    width 80%
+    line-height 40px
+    z-index 10
+    p
+      margin-left 15px
+  .content
     position fixed
     background white
     width 80%
-    top 10px
+    top 50px
     bottom 10px
-    box-shadow 1px 1px 1px #f9f5f5
-    overflow: hidden
-    .title
-      height 40px
-      line-height 40px
+  .filter-content
+    height 100%
+    overflow hidden
+    .item
+      height 30px
+      line-height 30px
       margin-left 15px
-    .filter-content
-      height: 100%
-      overflow: hidden
-      .item
-        height 30px
-        line-height 30px
-        margin-left 15px
 </style>

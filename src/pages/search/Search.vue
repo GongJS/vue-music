@@ -80,32 +80,30 @@
          v-else>
       <tab :tabs="tabs"
            @switchTab="switchTab"></tab>
-      <div class="scroll">
-        <scroll class="scroll-content"
-                :data="songs">
-          <keep-alive>
-            <!--单曲-->
-            <song-list :songs="songs"
-                       :showLoading="showLoading"
-                       v-if="songState"
-                       @select="selectItem">
-            </song-list>
-            <!--专辑-->
-            <album-list :inputData="inputData"
-                        :showLoading="showLoading"
-                        :inputState="inputState"
-                        v-else-if="albumState">
-            </album-list>
-            <!--视频-->
-            <vedio v-else-if="vedioState"></vedio>
-            <!--歌手-->
-            <singer :inputData="inputData"
-                    :showLoading="showLoading"
-                    :inputState="inputState"
-                    v-else-if="singerState">
-            </singer>
-          </keep-alive>
-        </scroll>
+      <div class="result"
+           ref="search">
+        <keep-alive>
+          <!--单曲-->
+          <song-list :songs="songs"
+                     :showLoading="showLoading"
+                     v-if="songState"
+                     @select="selectItem">
+          </song-list>
+          <!--专辑-->
+          <album-list :inputData="inputData"
+                      :showLoading="showLoading"
+                      :inputState="inputState"
+                      v-else-if="albumState">
+          </album-list>
+          <!--视频-->
+          <vedio v-else-if="vedioState"></vedio>
+          <!--歌手-->
+          <singer :inputData="inputData"
+                  :showLoading="showLoading"
+                  :inputState="inputState"
+                  v-else-if="singerState">
+          </singer>
+        </keep-alive>
       </div>
     </div>
   </div>
@@ -308,15 +306,6 @@ export default {
       this.searchHistory = arr
       localStorage.setItem('searchHistory', JSON.stringify(arr))
     },
-    // 当播放器变成mini播放器的时候，重新计算scroll的高度
-    handlePlaylist (playlist) {
-      setTimeout(() => {
-        console.log(this.$refs.searchHistory.style, this.$refs.searchScroll)
-        const bottom = playlist.length > 0 ? '102px' : ''
-        this.$refs.searchHistory.style.bottom = bottom
-        this.$refs.searchScroll.refresh()
-      }, 20)
-    },
     // 选择播放歌曲
     selectItem (backImage, playUrl, index, lyric) {
       this.songs[index].backImage = backImage
@@ -327,6 +316,15 @@ export default {
         list: this.songs,
         index
       })
+    },
+    // 当播放器变成mini播放器的时候，重新计算scroll的高度
+    handlePlaylist (playlist) {
+      if (playlist.length === 0) {
+        return
+      }
+      const bottom = '102px'
+      this.$refs.searchHistory.style.bottom = bottom
+      this.$refs.searchScroll.refresh()
     }
   },
   created () {
@@ -460,13 +458,4 @@ export default {
       .delete
         float right
         font-size 12px
-  .searchResult
-    .scroll
-      position fixed
-      top 95px
-      bottom 0
-      width 100%
-      .scroll-content
-        height 100%
-        overflow hidden
 </style>

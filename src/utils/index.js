@@ -19,17 +19,14 @@ export function getData (url, id) {
 
 // 根据id获取歌曲的音乐url，专辑背景，歌手名称， 歌词
 export async function getSongDate (obj) {
-  console.log(obj.id)
   let songInfo = {}
   let albumData = null
   songInfo.playUrl = `http://music.163.com/song/media/outer/url?id=${
     obj.id
   }.mp3`
   if (obj.al === undefined) {
-    console.log(22)
     albumData = await getData('/album', obj.album.id)
   } else {
-    console.log(33)
     albumData = await getData('/album', obj.al.id)
   }
   if (albumData.code === 200) {
