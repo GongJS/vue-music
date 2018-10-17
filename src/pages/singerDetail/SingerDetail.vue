@@ -110,6 +110,9 @@ export default {
       albumState: false,
       singerInfoState: false,
       vedioState: false,
+      songScrollY: 0,
+      albumScrollY: 0,
+      singerInfoScroll: 0,
       showLoading: true,
       url: 'artists'
     }
@@ -200,6 +203,7 @@ export default {
       // 在第一次切换tab的时候，加载完数据滑动到原先的位置
       setTimeout(() => {
         this.$refs.list.scrollTo(0, this.scrollY)
+        this.$refs.list.refresh()
       }, 20)
     },
     // 图片加载完重新刷新  better-scroll  防止无法拖动

@@ -122,6 +122,10 @@ export default {
           flex-wrap wrap
           height 100%
           margin-left 5px
+          min-width 0
+          overflow hidden
+          text-overflow ellipsis
+          white-space nowrap
           .name
             display flex
             align-items center
@@ -130,9 +134,6 @@ export default {
             width 100%
             color #55669A
             font-size 12px
-            white-space nowrap
-            overflow hidden
-            text-overflow ellipsis
           .singer
             display flex
             align-items center
