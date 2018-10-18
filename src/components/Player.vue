@@ -90,11 +90,10 @@
     <div class="mini-player"
          v-show="!fullScreen"
          @click="openNormalPlayer">
-      <img :src="currentSong.backImage" />
-      <div class="info">
-        <p>{{currentSong.name}}</p>
-        <p>横滑可以切换上下首哦</p>
-      </div>
+      <mini-player-swiper @next="next"
+                          @prev="prev"
+                          :songReady="songReady"
+                          :playingLyric="playingLyric"></mini-player-swiper>
       <div class="icon">
         <progress-circle :radius="radius"
                          :percent="percent">
@@ -102,7 +101,8 @@
                 @click.stop="togglePlaying"
                 v-html="miniIcon"></span>
         </progress-circle>
-        <span class="iconfont">&#xe802;</span>
+        <span class="iconfont"
+              style="color:#494949;font-size:40px;">&#xe802;</span>
       </div>
     </div>
     <audio :src="currentSong.playUrl"
@@ -119,6 +119,7 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { getSongDate, shuffle } from '@/utils'
 import { playMode } from '@/config'
+import miniPlayerSwiper from '@/components/miniPlayerswiper'
 import ProgressBar from '@/components/ProgressBar'
 import ProgressCircle from '@/components/ProgressCircle'
 import Scroll from '@/components/Scroll'
@@ -128,7 +129,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    miniPlayerSwiper
   },
   data () {
     return {
@@ -300,8 +302,8 @@ export default {
           index = this.playlist.length - 1
         }
         // 因为vuex里的playlist里面没有保存歌曲的封面，url地址，歌手名称，歌词，所以在切换新歌曲的时候需要根据歌曲id获取相关信息
-        if (this.nextSong.backImage === undefined) {
-          const result = await getSongDate(this.nextSong)
+        if (this.prev.backImage === undefined) {
+          const result = await getSongDate(this.prevSong)
           currentSong.backImage = result.backImage
           currentSong.singer = result.singer
           currentSong.playUrl = result.playUrl
@@ -488,7 +490,7 @@ export default {
           text-align center
           .text
             line-height 32px
-            color raba(255, 255, 255, 0.5)
+            color #a59a9a
             font-size 14px
             &.current
               color white
@@ -534,18 +536,11 @@ export default {
     align-items center
     border-top 1px solid #f1e9e9
     background white
-    img
-      border-radius 10px
-      padding 5px
-      height 90%
-    .info
-      width 70%
-      p
-        padding 5px
     .icon
-      width calc(30% - 45px)
+      width 15%
+      height 100%
       display flex
-      align-content center
+      align-items center
       justify-content space-around
       .iconfont
         font-size 0.6rem

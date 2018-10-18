@@ -59,5 +59,5 @@ export default {
       stroke #dec8c8
     &.progress-bar
       transform scale(0.9) rotate(-90deg)
-      stroke red
+      stroke #A24D3B
 </style>
