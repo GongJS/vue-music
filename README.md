@@ -2,9 +2,9 @@
 
 > 用`vue`做的一款模仿`网易云app`的 webapp，在 pc 端浏览此项目，需切换到手机预览模式，目前实现的功能有`手机号登录`、`歌手列表`、`歌曲查询`、`歌曲播放`等功能。
 
-[项目在线地址](http://132.232.73.32:3001)
+项目预览地址:[vue-music](http://132.232.73.32:3001)
 
-音乐接口用的开源项目[NeteaseCloudMusicApi/](https://binaryify.github.io/NeteaseCloudMusicApi/#/)
+音乐接口用的开源项目:[NeteaseCloudMusicApi/](https://binaryify.github.io/NeteaseCloudMusicApi/#/)
 
 ![image](1.gif)
 ![image](2.gif)
